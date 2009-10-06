@@ -1,22 +1,24 @@
-# jQuery Date Picker #
+# Image Cropper #
 
-Version: 1.1  
-Author: Max Wheeler (max@makenosound.com)  
-Build Date: 2009-07-14  
-Requirements: Symphony 2.0.4+
+* Version: 0.1 alpha
+* Author: Jonas Coch (jonas@klaftertief.de)
+* Build Date: 2009-10-7
+* Repository: http://github.com/klaftertief/imagecropper
+* Requirements:
+ * Symphony CMS 2.0.6 or newer: http://github.com/symphony/symphony-2
+ * Modified JIT Image Manipulation extension for frontend output: http://github.com/klaftertief/jit_image_manipulation
 
-Automatically enables the [jQuery Date Picker](http://docs.jquery.com/UI/Datepicker) on the "Publish" screen in the Symphony administration.
 
-## Installation ##
+Adds image cropping functionality to upload fields.
 
-1. Upload the 'jquery_date_picker' folder in this archive to your Symphony 'extensions' folder.
+## Installation
 
-2. Enable it by selecting the "jQuery Date Picker", choose Enable from the with-selected menu, then click Apply.
+1. Upload the 'imagecropper' folder in this archive to your Symphony 'extensions' folder.
 
-3. All done. Any Date fields on your Publish pages will have the date picker enabled.
+2. Enable it by selecting the "Field: Image Cropper", choose Enable from the with-selected menu, then click Apply.
+
+3. You can now add the "Image Cropper" field to your sections.
 
 ## Notes
 
-* The date format is currently set as the Symphony default: 20 January 2009. The format can be changed by editing the initialise.js file in accordance with the formatting instructions at: [http://docs.jquery.com/UI/Datepicker/%24.datepicker.formatDate](http://docs.jquery.com/UI/Datepicker/%24.datepicker.formatDate)
-
-* The date picker is styled using the default jQuery UI 'Cupertino' theme.
+* This is an alpha version. Don't use it on live sites.
