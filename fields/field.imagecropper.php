@@ -54,7 +54,7 @@
 			// related field
 			$label = Widget::Label(__('Related field'), NULL);
 			$fieldManager = new FieldManager($this->_engine);
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type = "input")');
+			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload")');
 			$options = array(
 				array('', false, __('None Selected'), ''),
 			);
