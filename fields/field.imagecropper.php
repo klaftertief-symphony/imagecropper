@@ -14,32 +14,33 @@
 			return true;
 		}
 		
-		function getToggleStates(){
-			return array('cropped' => __('Cropped'), 'not cropped' => __('Not cropped'));
-		}
-
-		function toggleFieldData($data, $newState){
-			$data['value'] = $newState;
-			return $data;
-		}
-
 		function displayDatasourceFilterPanel(&$wrapper, $data=NULL, $errors=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL){
-			
 			parent::displayDatasourceFilterPanel($wrapper, $data, $errors, $fieldnamePrefix, $fieldnamePostfix);
-
-			$existing_options = array('cropped', 'not cropped');
-
+			$existing_options = array('yes', 'no');
 			if(is_array($existing_options) && !empty($existing_options)){
 				$optionlist = new XMLElement('ul');
 				$optionlist->setAttribute('class', 'tags');
-				
 				foreach($existing_options as $option) $optionlist->appendChild(new XMLElement('li', $option));
-						
 				$wrapper->appendChild($optionlist);
 			}
-					
 		}
 
+		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation=false){
+			$field_id = $this->get('id');
+			$value = $this->cleanValue($data[0]);
+			$this->_key++;
+			$joins .= "
+				LEFT JOIN
+					`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+					ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+			";
+			$where .= "
+				AND t{$field_id}_{$this->_key}.cropped = '{$value}'
+			";
+			
+			return true;
+		}
+		
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
 			$message = NULL;
 			if ($this->get('required') == 'yes' && $data['cropped'] == 'not_yet'){
@@ -55,11 +56,6 @@
 			}
 			
 			return self::__OK__;
-		}
-
-		
-		function allowDatasourceParamOutput(){
-			return true;
 		}
 		
 		function displaySettingsPanel(&$wrapper, $errors=NULL) {
@@ -365,6 +361,7 @@
 		public function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
 			$status = self::__OK__;
 			$result = array(
+				'cropped' => $data['cropped'],
 				'ratio' => $data['ratio'],
 				'x1' => $data['x1'],
 				'x2' => $data['x2'],
@@ -394,13 +391,13 @@
 			}
 			
 		}
-		
+
 		public function appendFormattedElement(&$wrapper, $data, $encode = false) {
 
-			// create date and time element
 			$imagecropper = new XMLElement($this->get('element_name'));
 
 			$imagecropper->setAttributeArray(array(
+				'cropped' => $data['cropped'],
 				'x1' => $data['x1'],
 				'x2' => $data['x2'],
 				'y1' => $data['y1'],
