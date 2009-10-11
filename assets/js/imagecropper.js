@@ -4,19 +4,13 @@
  */
 
 ;(function ($) {
-	// Private class variables
 	var ver = '0.1';
 
-	// Chained function to create an imageCropper.
 	$.fn.imageCropper = function (options) {
 		return this.each(function() {
 			var $el = $(this);
-			// debug(options);
 			options = options || {};
 			var opts = $.extend({}, $.fn.imageCropper.defaults, options);
-			
-			// debug(opts);
-			
 			var
 				jcrop_api,
 				$select_ratio = $('#imagecropper_'+opts.field_id+'_ratios'),
@@ -27,8 +21,8 @@
 				image_link = upload_field.prev(),
 				box_width = options.box_width,
 				crop_coords = [];
-				
 			var show_coords = function (c) {
+				$('.imagecropper_cropped',$el[0]).val('yes');
 				$('.imagecropper_x1',$el[0]).val(c.x);
 				$('.imagecropper_y1',$el[0]).val(c.y);
 				$('.imagecropper_x2',$el[0]).val(c.x2);
@@ -97,6 +91,7 @@
 					$('.imagecropper_clear', $el[0]).click(function(e) {
 						e.preventDefault();
 						jcrop_api.release();
+						$('.imagecropper_cropped',$el[0]).val('no');
 						$('.imagecropper_x1',$el[0]).val('');
 						$('.imagecropper_y1',$el[0]).val('');
 						$('.imagecropper_x2',$el[0]).val('');
@@ -112,7 +107,6 @@
 	};
 	
 
-	// private function for debugging
 	function debug($obj) {
 		if (window.console && window.console.log)
 			window.console.log($obj);
@@ -120,7 +114,6 @@
 
 	$.fn.imageCropper.ver = function() { return ver; };
 
-	 // ImageCropper default options
 	$.fn.imageCropper.defaults = {
 	};
 	

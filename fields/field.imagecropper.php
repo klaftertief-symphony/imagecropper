@@ -40,6 +40,23 @@
 					
 		}
 
+		public function checkPostFieldData($data, &$message, $entry_id=NULL){
+			$message = NULL;
+			if ($this->get('required') == 'yes' && $data['cropped'] == 'not_yet'){
+				$message = __("'%s' is not cropped yet.", array($this->get('label')));
+				
+				return self::__OK__; // TODO: improve logic for first time upload of a file / creation of an entry
+			}
+
+			if ($this->get('required') == 'yes' && $data['cropped'] == 'no'){
+				$message = __("'%s' needs to be cropped.", array($this->get('label')));
+				
+				return self::__MISSING_FIELDS__;
+			}
+			
+			return self::__OK__;
+		}
+
 		
 		function allowDatasourceParamOutput(){
 			return true;
@@ -187,6 +204,7 @@
 				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
 				`id` int(11) unsigned NOT NULL auto_increment,
 				`entry_id` int(11) unsigned NOT NULL,
+			  `cropped` enum('yes','no','not_yet') NOT NULL default 'not_yet',
 				`ratio` varchar(255) default NULL,
 				`width` int(11) unsigned NOT NULL,
 				`height` int(11) unsigned NOT NULL,
@@ -270,7 +288,7 @@
 			$group = new XMLElement('div', NULL, array('class' => 'group'));
 
 			$actions = new XMLElement('div', NULL, array('class' => 'imagecropper_actions'));
-			$actions_description = new XMLElement('div', __('Actions'));
+			$actions_description = new XMLElement('h3', __('Actions'), array('class' => 'label'));
 			$actions_actions = new XMLElement('ul', NULL, array('class' => 'group'));
 			$open_modal = new XMLElement('li');
 			$open_modal->appendChild(Widget::Anchor(__('Crop in modal'), '#', __('Crop image in modal dialog'), 'imagecropper_modal'));
@@ -292,6 +310,9 @@
 			// $max_height = Widget::Input('', $this->get('max_height'), 'hidden', array('class' => 'imagecropper_max_height'));
 			// $group->appendChild($max_height);
 
+			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'not_yet', 'hidden', array('class' => 'imagecropper_cropped'));
+			$group->appendChild($cropped);
+
 			$x1 = Widget::Input($fieldname.'[x1]', $data['x1'], 'hidden', array('class' => 'imagecropper_x1'));
 			$group->appendChild($x1);
 
@@ -312,7 +333,13 @@
 			
 			$span->appendChild($group);
 			$imagecropper->appendChild($span);
-			$wrapper->appendChild($imagecropper);
+
+			if ($flagWithError != NULL) {
+				$wrapper->appendChild(Widget::wrapFormElementWithError($imagecropper, $flagWithError));
+			}
+			else {
+				$wrapper->appendChild($imagecropper);
+			}
 
 			$fieldManager = new FieldManager($this->_engine);
 			$related_field = $fieldManager->fetch($this->get('related_field_id'));
