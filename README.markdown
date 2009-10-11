@@ -8,7 +8,6 @@
   * Symphony CMS 2.0.6 or newer: http://github.com/symphony/symphony-2
   * Modified JIT Image Manipulation extension for frontend output: http://github.com/klaftertief/jit_image_manipulation
 
-
 Adds image cropping functionality to upload fields.
 
 ## Installation
