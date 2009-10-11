@@ -1,69 +1,137 @@
 <?php
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
-	
+
 	Class fieldImageCropper extends Field {
-	
+
+		const CROPPED = 0;
+		const WIDTH = 1;
+		const HEIGHT = 3;
+		const ERROR = 4;
+
+
 		function __construct(&$parent) {
 			parent::__construct($parent);
 			$this->_name = __('Image Cropper');
 			$this->_required = true;
 			$this->_showcolumn = true;
 		}
-		
+
 		function canFilter(){
 			return true;
 		}
-		
-		function displayDatasourceFilterPanel(&$wrapper, $data=NULL, $errors=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL){
-			parent::displayDatasourceFilterPanel($wrapper, $data, $errors, $fieldnamePrefix, $fieldnamePostfix);
-			$existing_options = array('yes', 'no');
-			if(is_array($existing_options) && !empty($existing_options)){
-				$optionlist = new XMLElement('ul');
-				$optionlist->setAttribute('class', 'tags');
-				foreach($existing_options as $option) $optionlist->appendChild(new XMLElement('li', $option));
-				$wrapper->appendChild($optionlist);
+
+		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation=false){
+
+			$parsed = array();
+
+			foreach ($data as $string) {
+				$type = self::__parseFilter($string);
+
+				if($type == self::ERROR) return false;
+
+				if(!is_array($parsed[$type])) $parsed[$type] = array();
+
+				$parsed[$type] = $string;
+			}
+
+			foreach($parsed as $type => $value){
+				var_dump($value);
+				switch($type){
+
+					case self::CROPPED:
+						$field_id = $this->get('id');
+						$this->_key++;
+						$joins .= "
+							LEFT JOIN
+								`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+								ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+						";
+						$where .= "
+							AND t{$field_id}_{$this->_key}.cropped = '{$value}'
+						";
+						break;
+
+					case self::WIDTH:
+						$field_id = $this->get('id');
+						$this->_key++;
+						$joins .= "
+							LEFT JOIN
+								`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+								ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+						";
+						$where .= "
+							AND t{$field_id}_{$this->_key}.width {$value}
+						";
+						break;
+
+					case self::HEIGHT:
+						$field_id = $this->get('id');
+						$this->_key++;
+						$joins .= "
+							LEFT JOIN
+								`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+								ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+						";
+						$where .= "
+							AND t{$field_id}_{$this->_key}.height {$value}
+						";
+						break;
+				}
+			}
+
+			return true;
+		}
+
+		protected static function __parseFilter(&$string){
+
+			$string = self::__cleanFilterString($string);
+
+			if(preg_match('/^cropped:/i', $string)){
+				$string = str_replace('cropped:', '', $string);
+				return self::CROPPED;
+			}
+
+			if(preg_match('/^width:/i', $string)){
+				$string = str_replace('width:', '', $string);
+				return self::WIDTH;
+			}
+
+			if(preg_match('/^height:/i', $string)){
+				$string = str_replace('height:', '', $string);
+				return self::HEIGHT;
 			}
 		}
 
-		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation=false){
-			$field_id = $this->get('id');
-			$value = $this->cleanValue($data[0]);
-			$this->_key++;
-			$joins .= "
-				LEFT JOIN
-					`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
-					ON (e.id = t{$field_id}_{$this->_key}.entry_id)
-			";
-			$where .= "
-				AND t{$field_id}_{$this->_key}.cropped = '{$value}'
-			";
-			
-			return true;
+		protected static function __cleanFilterString($string){
+			$string = trim($string);
+
+			return $string;
 		}
-		
+
+
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
 			$message = NULL;
 			if ($this->get('required') == 'yes' && $data['cropped'] == 'not_yet'){
 				$message = __("'%s' is not cropped yet.", array($this->get('label')));
-				
+
 				return self::__OK__; // TODO: improve logic for first time upload of a file / creation of an entry
 			}
 
 			if ($this->get('required') == 'yes' && $data['cropped'] == 'no'){
 				$message = __("'%s' needs to be cropped.", array($this->get('label')));
-				
+
 				return self::__MISSING_FIELDS__;
 			}
-			
+
 			return self::__OK__;
 		}
-		
+
 		function displaySettingsPanel(&$wrapper, $errors=NULL) {
 			parent::displaySettingsPanel($wrapper, $errors);
-			
+
 			// get current section id
 			$section_id = Administration::instance()->Page->_context[1];
-			
+
 			// related field
 			$label = Widget::Label(__('Related field'), NULL);
 			$fieldManager = new FieldManager($this->_engine);
@@ -82,16 +150,16 @@
 			$label->appendChild(Widget::Select('fields['.$this->get('sortorder').'][related_field_id]', $options));
 			if(isset($errors['related_field_id'])) {
 				$wrapper->appendChild(Widget::wrapFormElementWithError($label, $errors['related_field_id']));
-			} else { 
+			} else {
 				$wrapper->appendChild($label);
 			};
-			
+
 			// ratios
 			$label = new XMLElement('label', __('Aspect ratios <i>Optional</i>'));
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][ratios]', $this->get('ratios')));
 			if(isset($errors['ratios'])) {
 				$wrapper->appendChild(Widget::wrapFormElementWithError($label, $errors['ratios']));
-			} else { 
+			} else {
 				$wrapper->appendChild($label);
 			};
 			$ratios = array('1/1','3/2','2/3','4/3','3/4','16/9');
@@ -100,53 +168,53 @@
 				$filter->appendChild(new XMLElement('li', $ratio));
 			};
 			$wrapper->appendChild($filter);
-			
+
 			// min/max width
 			$width = new XMLElement('div', NULL, array('class' => 'group'));
 			$label = new XMLElement('label', __('Minimum width (integer) <i>Optional</i>'));
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][min_width]', $this->get('min_width')?$this->get('min_width'):''));
 			if(isset($errors['min_width'])) {
 				$width->appendChild(Widget::wrapFormElementWithError($label, $errors['min_width']));
-			} else { 
+			} else {
 				$width->appendChild($label);
 			};
 			$label = new XMLElement('label', __('Maximum width (integer) <i>Optional</i>'));
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][max_width]', $this->get('max_width')?$this->get('max_width'):''));
 			if(isset($errors['max_width'])) {
 				$width->appendChild(Widget::wrapFormElementWithError($label, $errors['max_width']));
-			} else { 
+			} else {
 				$width->appendChild($label);
 			};
 			$wrapper->appendChild($width);
-			
+
 			// min/max height
 			$height = new XMLElement('div', NULL, array('class' => 'group'));
 			$label = new XMLElement('label', __('Minimum height (integer) <i>Optional</i>'));
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][min_height]', $this->get('min_height')?$this->get('min_height'):''));
 			if(isset($errors['min_height'])) {
 				$height->appendChild(Widget::wrapFormElementWithError($label, $errors['min_height']));
-			} else { 
+			} else {
 				$height->appendChild($label);
 			};
 			$label = new XMLElement('label', __('Maximum height (integer) <i>Optional</i>'));
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][max_height]', $this->get('max_height')?$this->get('max_height'):''));
 			if(isset($errors['max_height'])) {
 				$height->appendChild(Widget::wrapFormElementWithError($label, $errors['max_height']));
-			} else { 
+			} else {
 				$height->appendChild($label);
 			};
 			$wrapper->appendChild($height);
-			
+
 			$this->appendShowColumnCheckbox($wrapper);
 			$this->appendRequiredCheckbox($wrapper);
 		}
-		
+
 		function checkFields(&$errors, $checkForDuplicates=true) {
 			// check if a related field has been selected
 			if($this->get('related_field_id') == '') {
 				$errors['related_field_id'] = __('This is a required field.');
 			}
-			
+
 			// check if ratios content is well formed
 			if($this->get('ratios')) {
 				$validate = true; // TODO
@@ -154,7 +222,7 @@
 					$errors['ratios'] = __('Ratios have to be well-formed. Please check your syntax.');
 				}
 			}
-			
+
 			// check if min/max fields are integers
 			$min_max_fields = array('min_width', 'max_width', 'min_height', 'max_height');
 			foreach ($min_max_fields as $field) {
@@ -162,18 +230,18 @@
 					$errors[$field] = __('This has to be an integer.');
 				}
 			}
-			
+
 			return parent::checkFields($errors, $checkForDuplicates);
 		}
-		
+
 		function commit() {
-			
+
 			if(!parent::commit()) return false;
-			
+
 			$id = $this->get('id');
-			
+
 			if($id === false) return false;
-			
+
 			$fields = array();
 			$fields['field_id'] = $id;
 			$all_fields = array(
@@ -190,11 +258,11 @@
 					$fields[$field] = $value;
 				}
 			}
-						
-			$this->_engine->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");		
+
+			$this->_engine->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
 			return $this->_engine->Database->insert($fields, 'tbl_fields_' . $this->handle());
 		}
-		
+
 		function createTable(){
 			return $this->_engine->Database->query(
 				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
@@ -213,16 +281,16 @@
 				);"
 			);
 		}
-		
+
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL) {
-			
+
 			$assets_path = '/extensions/imagecropper/assets/';
 			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/jquery.Jcrop.css', 'screen', 120, false);
 			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/publish.css', 'screen', 130, false);
 			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/jquery.Jcrop.min.js', 430, false);
 			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/jquery.simplemodal.js', 440, false);
 			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/imagecropper.js', 450, false);
-			
+
 			$id = $this->get('id');
 			$related_field_id = $this->get('related_field_id');
 			$fieldname = 'fields['.$this->get('element_name').']';
@@ -326,7 +394,7 @@
 
 			$height = Widget::Input($fieldname.'[height]', $data['height'], 'hidden', array('class' => 'imagecropper_height'));
 			$group->appendChild($height);
-			
+
 			$span->appendChild($group);
 			$imagecropper->appendChild($span);
 
@@ -355,9 +423,9 @@
 			$script->setAttributeArray(array('type' => 'text/javascript'));
 			$script->setValue($function_call);
 			$this->_engine->Page->addElementToHead($script, 460);
-			
+
 		}
-		
+
 		public function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
 			$status = self::__OK__;
 			$result = array(
@@ -372,24 +440,23 @@
 			);
 			return $result;
 		}
-		
+
 		function prepareTableValue($data, XMLElement $link=NULL, $entry_id){
 			$entryManager = new EntryManager($this->_engine);
 			$entries = $entryManager->fetch($entry_id, $this->get('parent_section'));
-			
-			
+
 			$image = '<img src="' . URL . '/image/1/0/50' . $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
-			
+
 			if($link){
 				$link->setValue($image);
 				return $link->generate();
 			}
-			
+
 			else{
 				$link = new XMLElement('span', $image);
 				return $link->generate();
 			}
-			
+
 		}
 
 		public function appendFormattedElement(&$wrapper, $data, $encode = false) {
@@ -406,9 +473,9 @@
 				'height' => $data['height'],
 				'ratio' => $data['ratio']
 			));
-			
+
 			$wrapper->appendChild($imagecropper);
-			
+
 		}
 
 	}
