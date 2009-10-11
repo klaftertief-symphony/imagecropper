@@ -46,18 +46,13 @@
 				image.src = image_link.attr('href');
 				
 				ratio = opts.ratio;
-				if (opts.ratio == 'select') {
+				if (ratio == 'select') {
 					if ($select_ratio.length) {
 						var calculated_ratio = Math.round(100 * Number($('.imagecropper_width',$el[0]).val()) / Number($('.imagecropper_height',$el[0]).val()));
-						// $('option',$select_ratio[0]).each(function() {
-						// 	if (Math.round(100*$(this).val()) == calculated_ratio) {
-						// 		$(this).attr('selected', 'selected');
-						// 	};
-						// });
 						ratio = $('option:selected',$select_ratio[0]).val();
 					};
-				// } else if (isNaN(parseFloat(opts.ratio))) {
-				// 	ratio = null;
+				} else if (ratio == 0) {
+					ratio = null;
 				};
 
 				$(image).load(function() {

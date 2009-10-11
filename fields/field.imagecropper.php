@@ -217,16 +217,21 @@
 			$imagecropper_ratios = NULL;
 			$imagecropper_ratio = NULL;
 			if(is_array($ratios)) {
-				$imagecropper_ratios = Widget::Label(__('Aspect Ratio'), NULL, 'imagecropper_ratios');
 				$number_of_ratios = count($ratios);
 				switch ($number_of_ratios) {
 					case 0:
 						$imagecropper_ratio = NULL;
+						$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
+						$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
+						$imagecropper_ratios->appendChild($label);
 						$imagecropper_ratios->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
 					break;
 					case 1:
 						if (in_array(0,$ratios)) {
 							$imagecropper_ratio = NULL;
+							$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
+							$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
+							$imagecropper_ratios->appendChild($label);
 							$imagecropper_ratios->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
 							break;
 						}
@@ -234,7 +239,10 @@
 						$dividend = preg_replace($pattern, '$2', $ratios[0]);
 						$divisor = preg_replace($pattern, '$6', $ratios[0]);
 						$imagecropper_ratio = round($dividend/$divisor,3);
-						$imagecropper_ratios->appendChild(new XMLElement('p', __('Fixed at ').$ratios[0], array('class' => 'help')));
+						$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
+						$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
+						$imagecropper_ratios->appendChild($label);
+						$imagecropper_ratios->appendChild(new XMLElement('p', __('Fixed at').$ratios[0], array('class' => 'help')));
 					break;
 					default:
 						$options = array();
@@ -246,6 +254,7 @@
 							$selected = ($ratio_float == $data['ratio']);
 							$options[] = array($ratio_float, $selected, $ratio);
 						}
+						$imagecropper_ratios = Widget::Label(__('Aspect Ratio'), NULL, 'imagecropper_ratios');
 						$imagecropper_ratios->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]', 'id' => 'imagecropper_'.$id.'_ratios')));
 						$imagecropper_ratio = 'select';
 					break;
@@ -272,10 +281,7 @@
 			$actions->appendChild($actions_description);
 			$actions->appendChild($actions_actions);
 			$group->appendChild($actions);
-
-			if ($imagecropper_ratios) {
-				$group->appendChild($imagecropper_ratios);
-			}
+			$group->appendChild($imagecropper_ratios);
 
 			// $min_width = Widget::Input('', $this->get('min_width'), 'hidden', array('class' => 'imagecropper_min_width'));
 			// $group->appendChild($min_width);

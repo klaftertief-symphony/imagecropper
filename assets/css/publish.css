@@ -1,6 +1,6 @@
 div.field-imagecropper div span { text-align: left; }
 div.field-imagecropper div.group { min-height: 30px; }
-div.field-imagecropper label.imagecropper_ratios p.help { margin: 0; }
+div.field-imagecropper div.label p.help { margin: 0; }
 
 
 /* Overlay */
