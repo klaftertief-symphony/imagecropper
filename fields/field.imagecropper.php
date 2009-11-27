@@ -5,7 +5,8 @@
 
 		const CROPPED = 0;
 		const WIDTH = 1;
-		const HEIGHT = 3;
+		const HEIGHT = 2;
+		const RATIO = 3;
 		const ERROR = 4;
 
 
@@ -35,7 +36,8 @@
 			}
 
 			foreach($parsed as $type => $value){
-				var_dump($value);
+				$value = trim($value);
+
 				switch($type){
 
 					case self::CROPPED:
@@ -76,6 +78,19 @@
 							AND t{$field_id}_{$this->_key}.height {$value}
 						";
 						break;
+
+						case self::RATIO:
+							$field_id = $this->get('id');
+							$this->_key++;
+							$joins .= "
+								LEFT JOIN
+									`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+									ON (e.id = t{$field_id}_{$this->_key}.entry_id)
+							";
+							$where .= "
+								AND t{$field_id}_{$this->_key}.ratio {$value}
+							";
+							break;
 				}
 			}
 
@@ -99,6 +114,11 @@
 			if(preg_match('/^height:/i', $string)){
 				$string = str_replace('height:', '', $string);
 				return self::HEIGHT;
+			}
+
+			if(preg_match('/^ratio:/i', $string)){
+				$string = str_replace('ratio:', '', $string);
+				return self::RATIO;
 			}
 		}
 
@@ -224,6 +244,7 @@
 			}
 
 			// check if min/max fields are integers
+			// TODO min < max - check
 			$min_max_fields = array('min_width', 'max_width', 'min_height', 'max_height');
 			foreach ($min_max_fields as $field) {
 				if ($this->get($field) != '' && !is_numeric($this->get($field))) {
