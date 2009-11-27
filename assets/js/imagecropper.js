@@ -33,7 +33,6 @@
 			
 			crop_coords = [Number($('.imagecropper_x1',$el[0]).val()), Number($('.imagecropper_y1',$el[0]).val()), Number($('.imagecropper_x2',$el[0]).val()), Number($('.imagecropper_y2',$el[0]).val())];
 			
-
 			if (image_link.length) {
 				box_width = $el.width();
 				image = new Image();
@@ -101,6 +100,9 @@
 					});
 
 				});
+			} else {
+				$('.group', $el).hide();
+				$el.append('No image found. Please upload an image and save entry.');
 			};
 
 		});
