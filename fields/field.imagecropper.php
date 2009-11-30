@@ -465,8 +465,12 @@
 		function prepareTableValue($data, XMLElement $link=NULL, $entry_id){
 			$entryManager = new EntryManager($this->_engine);
 			$entries = $entryManager->fetch($entry_id, $this->get('parent_section'));
-
-			$image = '<img src="' . URL . '/image/1/0/50' . $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
+			
+			if ($data['cropped'] == 'yes') {
+				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/75/0'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
+			} else {
+				$image = '<img src="' . URL . '/image/1/75/0'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
+			}
 
 			if($link){
 				$link->setValue($image);
