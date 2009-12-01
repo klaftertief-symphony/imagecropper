@@ -307,10 +307,12 @@
 
 			$assets_path = '/extensions/imagecropper/assets/';
 			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/jquery.Jcrop.css', 'screen', 120, false);
-			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/publish.css', 'screen', 130, false);
+			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/smoothness/jquery-ui-1.7.2.custom.css', 'screen', 130, false);
+			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/publish.css', 'screen', 140, false);
 			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/jquery.Jcrop.min.js', 430, false);
 			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/jquery.simplemodal.js', 440, false);
-			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/imagecropper.js', 450, false);
+			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/jquery-ui-1.7.2.custom.min.js', 450, false);
+			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/imagecropper.js', 460, false);
 
 			$id = $this->get('id');
 			$related_field_id = $this->get('related_field_id');
@@ -375,25 +377,16 @@
 			$actions = new XMLElement('div', NULL, array('class' => 'imagecropper_actions'));
 			$actions_description = new XMLElement('h3', __('Actions'), array('class' => 'label'));
 			$actions_actions = new XMLElement('ul', NULL, array('class' => 'group'));
-			$open_modal = new XMLElement('li');
-			$open_modal->appendChild(Widget::Anchor(__('Crop in modal'), '#', __('Crop image in modal dialog'), 'imagecropper_modal'));
+			$open_url_container = new XMLElement('li');
+			$open_url_container->appendChild(Widget::Anchor(__('Toggle URL'), '#', __('Create and copy URL for textareas'), 'imagecropper_url_toggle'));
 			$clear_values = new XMLElement('li');
 			$clear_values->appendChild(Widget::Anchor(__('Reset'), '#', __('Reset all values'), 'imagecropper_clear'));
-			$actions_actions->appendChild($open_modal);
+			$actions_actions->appendChild($open_url_container);
 			$actions_actions->appendChild($clear_values);
 			$actions->appendChild($actions_description);
 			$actions->appendChild($actions_actions);
 			$group->appendChild($actions);
 			$group->appendChild($imagecropper_ratios);
-
-			// $min_width = Widget::Input('', $this->get('min_width'), 'hidden', array('class' => 'imagecropper_min_width'));
-			// $group->appendChild($min_width);
-			// $max_width = Widget::Input('', $this->get('max_width'), 'hidden', array('class' => 'imagecropper_max_width'));
-			// $group->appendChild($max_width);
-			// $min_height = Widget::Input('', $this->get('min_height'), 'hidden', array('class' => 'imagecropper_min_height'));
-			// $group->appendChild($min_height);
-			// $max_height = Widget::Input('', $this->get('max_height'), 'hidden', array('class' => 'imagecropper_max_height'));
-			// $group->appendChild($max_height);
 
 			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'not_yet', 'hidden', array('class' => 'imagecropper_cropped'));
 			$group->appendChild($cropped);
@@ -417,6 +410,28 @@
 			$group->appendChild($height);
 
 			$span->appendChild($group);
+			
+			$url_container = new XMLElement('div', NULL, array('class' => 'imagecropper_url_container'));
+			$group = new XMLElement('div', NULL, array('class' => 'group'));
+
+			$direction = Widget::Label(__('Resize proportionally after cropping'), NULL, 'imagecropper_direction');
+			$direction->appendChild(Widget::Select(NULL, array(array('no',NULL,'No'),array('width',NULL,__('Yes, set width')),array('height',NULL,__('Yes, set height')))));
+
+			$slider = new XMLElement('div', NULL, array('class' => 'label'));
+			$label = new XMLElement('h3', __('Dimension'), array('class' => 'label'));
+			$slider->appendChild($label);
+			$slider->appendChild(new XMLElement('div', NULL, array('class' => 'imagecropper_url_slider')));
+
+			$group->appendChild($direction);
+			$group->appendChild($slider);
+
+			$url_url = Widget::Label(__('URL <i>You can copy the value for textareas</i>'));
+			$url_url->appendChild(Widget::Input($fieldname.'[url]', NULL, 'text', array('class' => 'imagecropper_url')));
+
+			$url_container->appendChild($group);
+			$url_container->appendChild($url_url);
+			$span->appendChild($url_container);
+
 			$imagecropper->appendChild($span);
 
 			if ($flagWithError != NULL) {
