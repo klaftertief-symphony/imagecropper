@@ -2,3 +2,5 @@ div.field-imagecropper div span { text-align: left; }
 div.field-imagecropper div.group { min-height: 30px; }
 div.field-imagecropper div.label p.help { margin: 0; }
 div.field-imagecropper div.invalid span { color: #222; }
+
+.imagecropper_url_slider { top: 0.3em; }
