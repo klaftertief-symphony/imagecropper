@@ -1,12 +1,12 @@
 # Image Cropper #
 
-* Version: 0.1 alpha
+* Version: 0.5 beta
 * Author: Jonas Coch (jonas@klaftertief.de)
-* Build Date: 2009-10-7
+* Build Date: 2009-12-2
 * Repository: http://github.com/klaftertief/imagecropper
 * Requirements:
   * Symphony CMS 2.0.6 or newer: http://github.com/symphony/symphony-2
-  * Modified JIT Image Manipulation extension for frontend output: http://github.com/klaftertief/jit_image_manipulation
+  * Modified JIT Image Manipulation extension for frontend and entry list output: http://github.com/klaftertief/jit_image_manipulation/tree/jCrop
 
 Adds image cropping functionality to upload fields.
 
@@ -20,4 +20,4 @@ Adds image cropping functionality to upload fields.
 
 ## Notes
 
-* This is an alpha version. Don't use it on live sites.
+* This is a beta version. Don't use it on live sites.
