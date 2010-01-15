@@ -177,7 +177,7 @@
 			// related field
 			$label = Widget::Label(__('Related upload field'), NULL);
 			$fieldManager = new FieldManager($this->_engine);
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload")');
+			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
 			$options = array(
 				array('', false, __('None Selected'), ''),
 			);
@@ -236,7 +236,7 @@
 			// check for presence of upload fields
 			$section_id = Administration::instance()->Page->_context[1];
 			$fieldManager = new FieldManager($this->_engine);
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload")');
+			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
 			if(empty($fields)) {
 				$errors['related_field_id'] = __('There is no upload field in this section. You have to save the section with an upload field before you can add an image cropper field.');
 			} else {
@@ -453,9 +453,9 @@
 			$entries = $entryManager->fetch($entry_id, $this->get('parent_section'));
 			
 			if ($data['cropped'] == 'yes') {
-				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/75/0'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
+				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/0/75'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
 			} else {
-				$image = '<span>'.__('Not cropped').'</span>';
+				$image = __('Not cropped');
 			}
 
 			if($link){
