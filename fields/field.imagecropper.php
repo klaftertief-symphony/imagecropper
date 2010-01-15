@@ -13,7 +13,7 @@
 		function __construct(&$parent) {
 			parent::__construct($parent);
 			$this->_name = __('Image Cropper');
-			$this->_required = true;
+			$this->_required = false;
 			$this->_showcolumn = true;
 		}
 
@@ -128,22 +128,35 @@
 			return $string;
 		}
 
-
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
 			$message = NULL;
-			if ($this->get('required') == 'yes' && $data['cropped'] == 'not_yet'){
-				$message = __("'%s' is not cropped yet.", array($this->get('label')));
 
-				return self::__OK__; // TODO: improve logic for first time upload of a file / creation of an entry
+			if($this->get('min_width') >= $data['width'] && strlen($data['width']) != 0){
+				$message = __('"%1$s" needs to have a width of at least %2$spx.', array($this->get('label'), $this->get('min_width')));
+				return self::__INVALID_FIELDS__;
 			}
-
-			if ($this->get('required') == 'yes' && $data['cropped'] == 'no'){
-				$message = __("'%s' needs to be cropped.", array($this->get('label')));
-
-				return self::__MISSING_FIELDS__;
+			
+			if($this->get('min_height') >= $data['height'] && strlen($data['height']) != 0){
+				$message = __('"%1$s" needs to have a height of at least %2$spx.', array($this->get('label'), $this->get('min_height')));
+				return self::__INVALID_FIELDS__;
 			}
 
 			return self::__OK__;
+		}
+
+		public function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
+			$status = self::__OK__;
+			$result = array(
+				'cropped' => $data['cropped'],
+				'ratio' => $data['ratio'],
+				'x1' => $data['x1'],
+				'x2' => $data['x2'],
+				'y1' => $data['y1'],
+				'y2' => $data['y2'],
+				'width' => $data['width'],
+				'height' => $data['height']
+			);
+			return $result;
 		}
 
 		function displaySettingsPanel(&$wrapper, $errors=NULL) {
@@ -153,7 +166,7 @@
 			$section_id = Administration::instance()->Page->_context[1];
 
 			// related field
-			$label = Widget::Label(__('Related field'), NULL);
+			$label = Widget::Label(__('Related upload field'), NULL);
 			$fieldManager = new FieldManager($this->_engine);
 			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload")');
 			$options = array(
@@ -189,65 +202,58 @@
 			};
 			$wrapper->appendChild($filter);
 
-			// min/max width
-			$width = new XMLElement('div', NULL, array('class' => 'group'));
-			$label = new XMLElement('label', __('Minimum width (integer) <i>Optional</i>'));
+			// minimal dimension
+			$min_dimension = new XMLElement('div', NULL, array('class' => 'group'));
+			$label = new XMLElement('label', __('Minimum width <i>Optional</i>'));
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][min_width]', $this->get('min_width')?$this->get('min_width'):''));
 			if(isset($errors['min_width'])) {
-				$width->appendChild(Widget::wrapFormElementWithError($label, $errors['min_width']));
+				$min_dimension->appendChild(Widget::wrapFormElementWithError($label, $errors['min_width']));
 			} else {
-				$width->appendChild($label);
+				$min_dimension->appendChild($label);
 			};
-			$label = new XMLElement('label', __('Maximum width (integer) <i>Optional</i>'));
-			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][max_width]', $this->get('max_width')?$this->get('max_width'):''));
-			if(isset($errors['max_width'])) {
-				$width->appendChild(Widget::wrapFormElementWithError($label, $errors['max_width']));
-			} else {
-				$width->appendChild($label);
-			};
-			$wrapper->appendChild($width);
-
-			// min/max height
-			$height = new XMLElement('div', NULL, array('class' => 'group'));
-			$label = new XMLElement('label', __('Minimum height (integer) <i>Optional</i>'));
+			$label = new XMLElement('label', __('Minimum height <i>Optional</i>'));
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][min_height]', $this->get('min_height')?$this->get('min_height'):''));
 			if(isset($errors['min_height'])) {
-				$height->appendChild(Widget::wrapFormElementWithError($label, $errors['min_height']));
+				$min_dimension->appendChild(Widget::wrapFormElementWithError($label, $errors['min_height']));
 			} else {
-				$height->appendChild($label);
+				$min_dimension->appendChild($label);
 			};
-			$label = new XMLElement('label', __('Maximum height (integer) <i>Optional</i>'));
-			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][max_height]', $this->get('max_height')?$this->get('max_height'):''));
-			if(isset($errors['max_height'])) {
-				$height->appendChild(Widget::wrapFormElementWithError($label, $errors['max_height']));
-			} else {
-				$height->appendChild($label);
-			};
-			$wrapper->appendChild($height);
+			$wrapper->appendChild($min_dimension);
 
 			$this->appendShowColumnCheckbox($wrapper);
-			$this->appendRequiredCheckbox($wrapper);
 		}
 
 		function checkFields(&$errors, $checkForDuplicates=true) {
-			// check if a related field has been selected
-			if($this->get('related_field_id') == '') {
-				$errors['related_field_id'] = __('This is a required field.');
-			}
+			// check for presence of upload fields
+			$section_id = Administration::instance()->Page->_context[1];
+			$fieldManager = new FieldManager($this->_engine);
+			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload")');
+			if(empty($fields)) {
+				$errors['related_field_id'] = __('There is no upload field in this section. You have to save the section with an upload field before you can add an image cropper field.');
+			} else {
+				// check if a related field has been selected
+				if($this->get('related_field_id') == '') {
+					$errors['related_field_id'] = __('This is a required field.');
+				}
+			};
 
 			// check if ratios content is well formed
 			if($this->get('ratios')) {
-				$validate = true; // TODO
-				if(!$validate) {
-					$errors['ratios'] = __('Ratios have to be well-formed. Please check your syntax.');
+				$ratios = explode(',', $this->get('ratios'));
+				$ratios = array_map('trim', $ratios);
+				
+				foreach ($ratios as $ratio) {
+					if(!preg_match('/^\d+\/\d+$/', $ratio)) {
+						$errors['ratios'] = __('Ratios have to be well formed.');
+					}
 				}
 			}
 
-			// check if min/max fields are integers
-			// TODO min < max - check
-			$min_max_fields = array('min_width', 'max_width', 'min_height', 'max_height');
-			foreach ($min_max_fields as $field) {
-				if ($this->get($field) != '' && !is_numeric($this->get($field))) {
+			// check if min fields are integers
+			$min_fields = array('min_width', 'min_height');
+			foreach ($min_fields as $field) {
+				$i = $this->get($field);
+				if ($i != '' && !preg_match('/^\d+$/', $i)) {
 					$errors[$field] = __('This has to be an integer.');
 				}
 			}
@@ -269,9 +275,7 @@
 				'related_field_id',
 				'ratios',
 				'min_width',
-				'max_width',
-				'min_height',
-				'max_height'
+				'min_height'
 			);
 			foreach ($all_fields as $field) {
 				$value = $this->get($field);
@@ -289,14 +293,14 @@
 				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
 				`id` int(11) unsigned NOT NULL auto_increment,
 				`entry_id` int(11) unsigned NOT NULL,
-			  `cropped` enum('yes','no','not_yet') NOT NULL default 'not_yet',
+			  `cropped` enum('yes','no') NOT NULL default 'no',
 				`ratio` varchar(255) default NULL,
-				`width` int(11) unsigned NOT NULL,
-				`height` int(11) unsigned NOT NULL,
-				`x1` int(11) unsigned NOT NULL,
-				`x2` int(11) unsigned NOT NULL,
-				`y1` int(11) unsigned NOT NULL,
-				`y2` int(11) unsigned NOT NULL,
+				`width` int(11) unsigned default NULL,
+				`height` int(11) unsigned default NULL,
+				`x1` int(11) unsigned default NULL,
+				`x2` int(11) unsigned default NULL,
+				`y1` int(11) unsigned default NULL,
+				`y2` int(11) unsigned default NULL,
 				PRIMARY KEY  (`id`),
 				KEY `entry_id` (`entry_id`)
 				);"
@@ -433,21 +437,6 @@
 			$script->setValue($function_call);
 			$this->_engine->Page->addElementToHead($script, 460);
 
-		}
-
-		public function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
-			$status = self::__OK__;
-			$result = array(
-				'cropped' => $data['cropped'],
-				'ratio' => $data['ratio'],
-				'x1' => $data['x1'],
-				'x2' => $data['x2'],
-				'y1' => $data['y1'],
-				'y2' => $data['y2'],
-				'width' => $data['width'],
-				'height' => $data['height']
-			);
-			return $result;
 		}
 
 		function prepareTableValue($data, XMLElement $link=NULL, $entry_id){
