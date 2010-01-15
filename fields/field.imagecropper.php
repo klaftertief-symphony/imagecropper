@@ -446,7 +446,7 @@
 			if ($data['cropped'] == 'yes') {
 				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/75/0'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
 			} else {
-				$image = '<img src="' . URL . '/image/1/75/0'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
+				$image = '<span>'.__('Not cropped').'</span>';
 			}
 
 			if($link){
