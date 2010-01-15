@@ -23,9 +23,7 @@
 					`field_id` int(11) unsigned NOT NULL,
 					`related_field_id` int(11) unsigned NOT NULL,
 					`min_width` int(11) unsigned NOT NULL,
-					`max_width` int(11) unsigned NOT NULL,
 					`min_height` int(11) unsigned NOT NULL,
-					`max_height` int(11) unsigned NOT NULL,
 					`ratios` text, 
 					PRIMARY KEY  (`id`),
 					KEY `field_id` (`field_id`)
