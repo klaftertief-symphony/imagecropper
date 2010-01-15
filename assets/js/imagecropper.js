@@ -8,6 +8,7 @@
 
 	$.fn.imageCropper = function (options) {
 		return this.each(function() {
+			var el = this;
 			var $el = $(this);
 			options = options || {};
 			var opts = $.extend({}, $.fn.imageCropper.defaults, options);
@@ -25,19 +26,19 @@
 				box_width = options.box_width,
 				crop_coords = [];
 			var show_coords = function(c) {
-				$('.imagecropper_cropped',$el[0]).val('yes');
-				$('.imagecropper_x1',$el[0]).val(c.x);
-				$('.imagecropper_y1',$el[0]).val(c.y);
-				$('.imagecropper_x2',$el[0]).val(c.x2);
-				$('.imagecropper_y2',$el[0]).val(c.y2);
-				$('.imagecropper_width',$el[0]).val(c.w);
-				$('.imagecropper_height',$el[0]).val(c.h);
+				$('.imagecropper_cropped',el).val('yes');
+				$('.imagecropper_x1',el).val(c.x);
+				$('.imagecropper_y1',el).val(c.y);
+				$('.imagecropper_x2',el).val(c.x2);
+				$('.imagecropper_y2',el).val(c.y2);
+				$('.imagecropper_width',el).val(c.w);
+				$('.imagecropper_height',el).val(c.h);
 			};
 			
-			crop_coords = [Number($('.imagecropper_x1',$el[0]).val()), Number($('.imagecropper_y1',$el[0]).val()), Number($('.imagecropper_x2',$el[0]).val()), Number($('.imagecropper_y2',$el[0]).val())];
+			crop_coords = [Number($('.imagecropper_x1',el).val()), Number($('.imagecropper_y1',el).val()), Number($('.imagecropper_x2',el).val()), Number($('.imagecropper_y2',el).val())];
 			
 			if (image_link.length) {
-				slider = $('.imagecropper_url_slider',$el[0]);
+				slider = $('.imagecropper_url_slider',el);
 				box_width = $el.width();
 				image = new Image();
 				image.src = image_link.attr('href');
@@ -46,7 +47,7 @@
 				ratio = opts.ratio;
 				if (ratio == 'select') {
 					if ($select_ratio.length) {
-						var calculated_ratio = Math.round(100 * Number($('.imagecropper_width',$el[0]).val()) / Number($('.imagecropper_height',$el[0]).val()));
+						var calculated_ratio = Math.round(100 * Number($('.imagecropper_width',el).val()) / Number($('.imagecropper_height',el).val()));
 						ratio = $('option:selected',$select_ratio[0]).val();
 					};
 				} else if (ratio == 0) {
@@ -87,16 +88,16 @@
 						});
 					};
 
-					$('.imagecropper_clear', $el[0]).click(function(e) {
+					$('.imagecropper_clear', el).click(function(e) {
 						e.preventDefault();
 						jcrop_api.release();
-						$('.imagecropper_cropped',$el[0]).val('no');
-						$('.imagecropper_x1',$el[0]).val('');
-						$('.imagecropper_y1',$el[0]).val('');
-						$('.imagecropper_x2',$el[0]).val('');
-						$('.imagecropper_y2',$el[0]).val('');
-						$('.imagecropper_width',$el[0]).val('');
-						$('.imagecropper_height',$el[0]).val('');
+						$('.imagecropper_cropped',el).val('no');
+						$('.imagecropper_x1',el).val('');
+						$('.imagecropper_y1',el).val('');
+						$('.imagecropper_x2',el).val('');
+						$('.imagecropper_y2',el).val('');
+						$('.imagecropper_width',el).val('');
+						$('.imagecropper_height',el).val('');
 					});
 
 				});
