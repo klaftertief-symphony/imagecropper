@@ -20,9 +20,6 @@
 				field_name = opts.related_field_name,
 				upload_field = $('input[name="fields['+field_name+']"]'),
 				image_link = upload_field.prev(),
-				image_path,
-				search = /[^(\/workspace\/)](\S)*/,
-				slider,
 				box_width = options.box_width,
 				crop_coords = [];
 			var show_coords = function(c) {
@@ -38,11 +35,9 @@
 			crop_coords = [Number($('.imagecropper_x1',el).val()), Number($('.imagecropper_y1',el).val()), Number($('.imagecropper_x2',el).val()), Number($('.imagecropper_y2',el).val())];
 			
 			if (image_link.length) {
-				slider = $('.imagecropper_url_slider',el);
 				box_width = $el.width();
 				image = new Image();
 				image.src = image_link.attr('href');
-				image_path = search.exec(image_link.text())[0];
 				
 				ratio = opts.ratio;
 				if (ratio == 'select') {
@@ -61,7 +56,6 @@
 							boxWidth: box_width,
 							aspectRatio: ratio,
 							minSize: opts.minSize,
-							maxSize: opts.maxSize,
 							onChange: show_coords,
 							onSelect: show_coords
 						});
@@ -71,7 +65,6 @@
 							boxWidth: box_width,
 							aspectRatio: ratio,
 							minSize: opts.minSize,
-							maxSize: opts.maxSize,
 							setSelect: crop_coords,
 							onChange: show_coords,
 							onSelect: show_coords
