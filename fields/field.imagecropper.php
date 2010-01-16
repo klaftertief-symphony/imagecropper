@@ -9,7 +9,6 @@
 		const RATIO = 3;
 		const ERROR = 4;
 
-
 		function __construct(&$parent) {
 			parent::__construct($parent);
 			$this->_name = __('Image Cropper');
@@ -24,7 +23,7 @@
 		function isSortable(){
 			return true;
 		}
-		
+
 		public function buildSortingSQL(&$joins, &$where, &$sort, $order='ASC'){
 			$joins .= "LEFT OUTER JOIN `tbl_entries_data_".$this->get('id')."` AS `ed` ON (`e`.`id` = `ed`.`entry_id`) ";
 			$sort = 'ORDER BY ' . (in_array(strtolower($order), array('random', 'rand')) ? 'RAND()' : "`ed`.`cropped` $order");
@@ -140,12 +139,12 @@
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
 			$message = NULL;
 
-			if($this->get('min_width') >= $data['width'] && strlen($data['width']) != 0){
+			if($this->get('min_width') > $data['width'] && strlen($data['width']) != 0){
 				$message = __('"%1$s" needs to have a width of at least %2$spx.', array($this->get('label'), $this->get('min_width')));
 				return self::__INVALID_FIELDS__;
 			}
 			
-			if($this->get('min_height') >= $data['height'] && strlen($data['height']) != 0){
+			if($this->get('min_height') > $data['height'] && strlen($data['height']) != 0){
 				$message = __('"%1$s" needs to have a height of at least %2$spx.', array($this->get('label'), $this->get('min_height')));
 				return self::__INVALID_FIELDS__;
 			}
@@ -328,6 +327,17 @@
 			$related_field_id = $this->get('related_field_id');
 			$fieldname = 'fields['.$this->get('element_name').']';
 
+			// get related image dimensions
+			$context = Administration::instance()->Page->Context();
+			$entry_id = $context['entry_id'];
+			$entryManager = new EntryManager($this->_engine);
+			$related_image = $entryManager->fetch($entry_id);
+			
+			$metadata = unserialize($related_image[0]->_data[$related_field_id]['meta']);
+			if (is_array($metadata) && !empty($metadata)) {
+				$trueSize = array($metadata['width'],$metadata['height']);
+			}
+
 			$ratios = array_unique(explode(',',$this->get('ratios')));
 			$imagecropper_ratios = NULL;
 			$imagecropper_ratio = NULL;
@@ -395,7 +405,7 @@
 			$group->appendChild($actions);
 			$group->appendChild($imagecropper_ratios);
 
-			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'not_yet', 'hidden', array('class' => 'imagecropper_cropped'));
+			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'no', 'hidden', array('class' => 'imagecropper_cropped'));
 			$group->appendChild($cropped);
 
 			$x1 = Widget::Input($fieldname.'[x1]', $data['x1'], 'hidden', array('class' => 'imagecropper_x1'));
@@ -430,16 +440,21 @@
 			$fieldManager = new FieldManager($this->_engine);
 			$related_field = $fieldManager->fetch($this->get('related_field_id'));
 			$script = new XMLElement('script');
+			$options = '
+				field_id: '.$id.',
+				related_field_id: '.$this->get('related_field_id').',
+				related_field_name: "'.$related_field->get('element_name').'",
+				ratio: "'.$imagecropper_ratio.'",
+				minSize: ['.$this->get('min_width').','.$this->get('min_height').'],
+			';
+			if ($entry_id) {
+				$options .= 'trueSize: ['.$trueSize[0].','.$trueSize[1].']';
+			}
 			$function_call = '
 				jQuery(document).ready(function ($) {
-					$("#imagecropper_'.$id.'").imageCropper({
-						field_id: '.$id.',
-						related_field_id: '.$related_field->get('id').',
-						related_field_name: "'.$related_field->get('element_name').'",
-						ratio: "'.$imagecropper_ratio.'",
-						minSize: ['.$this->get('min_width').','.$this->get('min_height').'],
-						maxSize: ['.$this->get('max_width').','.$this->get('max_height').'],
-					});
+					$("#imagecropper_'.$id.'").imageCropper({'
+						.$options.
+					'});
 				});
 			';
 			$script->setAttributeArray(array('type' => 'text/javascript'));
@@ -450,7 +465,7 @@
 
 		function prepareTableValue($data, XMLElement $link=NULL, $entry_id){
 			$entryManager = new EntryManager($this->_engine);
-			$entries = $entryManager->fetch($entry_id, $this->get('parent_section'));
+			$entries = $entryManager->fetch($entry_id);
 			
 			if ($data['cropped'] == 'yes') {
 				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/0/75'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
