@@ -327,17 +327,6 @@
 			$related_field_id = $this->get('related_field_id');
 			$fieldname = 'fields['.$this->get('element_name').']';
 
-			// get related image dimensions
-			$context = Administration::instance()->Page->Context();
-			$entry_id = $context['entry_id'];
-			$entryManager = new EntryManager($this->_engine);
-			$related_image = $entryManager->fetch($entry_id);
-			
-			$metadata = unserialize($related_image[0]->_data[$related_field_id]['meta']);
-			if (is_array($metadata) && !empty($metadata)) {
-				$trueSize = array($metadata['width'],$metadata['height']);
-			}
-
 			$ratios = array_unique(explode(',',$this->get('ratios')));
 			$imagecropper_ratios = NULL;
 			$imagecropper_ratio = NULL;
@@ -447,9 +436,6 @@
 				ratio: "'.$imagecropper_ratio.'",
 				minSize: ['.$this->get('min_width').','.$this->get('min_height').'],
 			';
-			if ($entry_id) {
-				$options .= 'trueSize: ['.$trueSize[0].','.$trueSize[1].']';
-			}
 			$function_call = '
 				jQuery(document).ready(function ($) {
 					$("#imagecropper_'.$id.'").imageCropper({'
