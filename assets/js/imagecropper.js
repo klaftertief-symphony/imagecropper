@@ -15,7 +15,7 @@
 			var
 				jcrop_api,
 				$select_ratio = $('#imagecropper_'+opts.field_id+'_ratios'),
-				ratio = null,
+				aspect_ratio = null,
 				image = null,
 				field_name = opts.related_field_name,
 				upload_field = $('input[name="fields['+field_name+']"]'),
@@ -30,6 +30,7 @@
 				$('.imagecropper_y2',el).val(c.y2);
 				$('.imagecropper_width',el).val(c.w);
 				$('.imagecropper_height',el).val(c.h);
+				$('.imagecropper_free_ratio',el).val(Math.round(100 * c.w/c.h)/100);
 			};
 			
 			crop_coords = [Number($('.imagecropper_x1',el).val()), Number($('.imagecropper_y1',el).val()), Number($('.imagecropper_x2',el).val()), Number($('.imagecropper_y2',el).val())];
@@ -39,22 +40,22 @@
 				image = new Image();
 				image.src = image_link.attr('href');
 				
-				ratio = opts.ratio;
-				if (ratio == 'select') {
+				aspect_ratio = opts.ratio;
+				if (aspect_ratio == 'select') {
 					if ($select_ratio.length) {
 						var calculated_ratio = Math.round(100 * Number($('.imagecropper_width',el).val()) / Number($('.imagecropper_height',el).val()));
-						ratio = $('option:selected',$select_ratio[0]).val();
+						aspect_ratio = $('option:selected',$select_ratio[0]).val();
 					};
-				} else if (ratio == 0) {
-					ratio = null;
+				} else if (aspect_ratio == 0) {
+					aspect_ratio = null;
 				};
 				
 				$(image).load(function() {
 					if (crop_coords.toString() == '0,0,0,0') {
 						$(image).appendTo($el);
 						jcrop_api = $.Jcrop(image, {
+							aspectRatio: aspect_ratio,
 							boxWidth: box_width,
-							aspectRatio: ratio,
 							minSize: opts.minSize,
 							onChange: show_coords,
 							onSelect: show_coords
@@ -62,8 +63,8 @@
 					} else {
 						$(image).appendTo($el);
 						jcrop_api = $.Jcrop(image, {
+							aspectRatio: aspect_ratio,
 							boxWidth: box_width,
-							aspectRatio: ratio,
 							minSize: opts.minSize,
 							setSelect: crop_coords,
 							onChange: show_coords,
@@ -91,6 +92,7 @@
 						$('.imagecropper_y2',el).val('');
 						$('.imagecropper_width',el).val('');
 						$('.imagecropper_height',el).val('');
+						$('.imagecropper_free_ratio',el).val('');
 					});
 
 				});

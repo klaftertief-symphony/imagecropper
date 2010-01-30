@@ -154,6 +154,7 @@
 
 		public function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
 			$status = self::__OK__;
+			print_r($data);
 			$result = array(
 				'cropped' => $data['cropped'],
 				'ratio' => $data['ratio'],
@@ -338,6 +339,7 @@
 						$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
 						$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
 						$imagecropper_ratios->appendChild($label);
+						$imagecropper_ratios->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
 						$imagecropper_ratios->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
 					break;
 					case 1:
@@ -346,6 +348,7 @@
 							$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
 							$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
 							$imagecropper_ratios->appendChild($label);
+							$imagecropper_ratios->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
 							$imagecropper_ratios->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
 							break;
 						}
@@ -356,7 +359,8 @@
 						$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
 						$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
 						$imagecropper_ratios->appendChild($label);
-						$imagecropper_ratios->appendChild(new XMLElement('p', __('Fixed at').$ratios[0], array('class' => 'help')));
+						$imagecropper_ratios->appendChild(Widget::Input($fieldname.'[ratio]', $imagecropper_ratio, 'hidden'));
+						$imagecropper_ratios->appendChild(new XMLElement('p', __('Fixed at ').$ratios[0], array('class' => 'help')));
 					break;
 					default:
 						$options = array();

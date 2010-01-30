@@ -14,7 +14,7 @@
 		'This has to be an integer.' => 'Dieses muß eine Ganze Zahl sein.',
 		'Aspect ratio' => 'Seitenverhältnis',
 		'Free cropping' => 'Freies Beschneiden',
-		'Fixed at' => 'Fixiert auf',
+		'Fixed at ' => 'Fixiert auf ',
 		'Optional' => 'Optional',
 		'Actions' => 'Aktionen',
 		'Reset' => 'Zurücksetzen',

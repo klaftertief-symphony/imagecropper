@@ -23,13 +23,26 @@ This extension contains the following languages:
 
 3. You can now add the "Image Cropper" field to your sections with already existing upload fields.
 
+4. Make sure you have [Modified JIT Image Manipulation extension](http://github.com/klaftertief/jit_image_manipulation/tree/jCrop) installed and activated.
+
 ## Documentation
 
-TODO
+### Backend
+
+You can add a filter to your datasource. The syntax is like width: >200, height: <=300, cropped: yes and ratio: >1.
+There is an optional thumbnail preview in entry overview tables.
+
+### Frontend
+
+The XML output is somethinge like
+
+	<thumbnail cropped="yes" x1="519" x2="2003" y1="132" y2="1616" width="1484" height="1484" ratio="1" />
+
+The jCrop mode of JIT expects a url like /image/4/crop_width/crop_height/crop_x/crop_y/resize_width/resize_height/path/to/image.jpg. resize_width and resize_height should either equal crop_width and crop_height (no resizing) or one should be 0 and the other smaller than the crop value (proportional resize).
 
 ## Change Log
 
-Version 0.9 - 24th January 2010
+Version 0.6 - 24th January 2010
 
 * first public version on Symphonys extension page
 
