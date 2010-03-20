@@ -33,8 +33,6 @@
 			
 		public function uninstall() {
 			Symphony::Database()->query("DROP TABLE `tbl_fields_imagecropper`");
-			$this->_Parent->Configuration->remove('imagecropper');
-			$this->_Parent->saveConfig();
 		}
 		
 		public function getSubscribedDelegates(){
