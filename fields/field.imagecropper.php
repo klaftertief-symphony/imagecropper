@@ -139,14 +139,16 @@
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
 			$message = NULL;
 
-			if($this->get('min_width') > $data['width'] && strlen($data['width']) != 0){
-				$message = __('"%1$s" needs to have a width of at least %2$spx.', array($this->get('label'), $this->get('min_width')));
-				return self::__INVALID_FIELDS__;
-			}
-			
-			if($this->get('min_height') > $data['height'] && strlen($data['height']) != 0){
-				$message = __('"%1$s" needs to have a height of at least %2$spx.', array($this->get('label'), $this->get('min_height')));
-				return self::__INVALID_FIELDS__;
+			if ($data['cropped'] == 'yes') {
+				if($this->get('min_width') > $data['width']){
+					$message = __('"%1$s" needs to have a width of at least %2$spx.', array($this->get('label'), $this->get('min_width')));
+					return self::__INVALID_FIELDS__;
+				}
+
+				if($this->get('min_height') > $data['height']){
+					$message = __('"%1$s" needs to have a height of at least %2$spx.', array($this->get('label'), $this->get('min_height')));
+					return self::__INVALID_FIELDS__;
+				}
 			}
 
 			return self::__OK__;
