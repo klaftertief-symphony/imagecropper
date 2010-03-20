@@ -176,7 +176,7 @@
 			// related field
 			$label = Widget::Label(__('Related upload field'), NULL);
 			$fieldManager = new FieldManager($this->_engine);
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
+			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="advancedupload")');
 			$options = array(
 				array('', false, __('None Selected'), ''),
 			);
