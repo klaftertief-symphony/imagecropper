@@ -154,7 +154,6 @@
 
 		public function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
 			$status = self::__OK__;
-			print_r($data);
 			$result = array(
 				'cropped' => $data['cropped'],
 				'ratio' => $data['ratio'],
@@ -454,13 +453,13 @@
 		}
 
 		function prepareTableValue($data, XMLElement $link=NULL, $entry_id){
-			$entryManager = new EntryManager($this->_engine);
-			$entries = $entryManager->fetch($entry_id);
-			
 			if ($data['cropped'] == 'yes') {
+				$entryManager = new EntryManager($this->_engine);
+				$entries = $entryManager->fetch($entry_id);
+
 				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/0/75'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
 			} else {
-				$image = __('Not cropped');
+				return parent::prepareTableValue(NULL);
 			}
 
 			if($link){
