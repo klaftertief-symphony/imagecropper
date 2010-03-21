@@ -4,8 +4,6 @@
  */
 
 ;(function ($) {
-	var ver = '0.5';
-
 	$.fn.imageCropper = function (options) {
 		return this.each(function() {
 			var el = this;
@@ -46,8 +44,6 @@
 						var calculated_ratio = Math.round(100 * Number($('.imagecropper_width',el).val()) / Number($('.imagecropper_height',el).val()));
 						aspect_ratio = $('option:selected',$select_ratio[0]).val();
 					};
-				} else if (aspect_ratio == 0) {
-					aspect_ratio = null;
 				};
 				
 				$(image).load(function() {
@@ -109,8 +105,6 @@
 		if (window.console && window.console.log)
 			window.console.log($obj);
 	};
-
-	$.fn.imageCropper.ver = function() { return ver; };
 
 	$.fn.imageCropper.defaults = {
 	};
