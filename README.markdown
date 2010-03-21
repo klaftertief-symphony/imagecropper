@@ -21,7 +21,7 @@ This extension contains the following languages:
 
 2. Enable it by selecting the "Field: Image Cropper", choose Enable from the with-selected menu, then click Apply.
 
-3. You can now add the "Image Cropper" field to your sections with already existing upload fields.
+3. You can now add the "Image Cropper" field to your sections with already existing upload fields. The section has to be saved with an upload field before you can add an imagecropper field.
 
 4. Make sure you have [Modified JIT Image Manipulation extension](http://github.com/klaftertief/jit_image_manipulation/tree/jCrop) installed and activated.
 
@@ -37,7 +37,7 @@ The jCrop mode of JIT expects a url like `/image/4/crop_width/crop_height/crop_x
 
 ### Backend
 
-There needs to be an upload field in the section before you can add an imagecropper field.
+There needs to be an upload field in the section before you can add an imagecropper field. The section has to be saved with an upload field before you can add an imagecropper field.
 
 You can add a filter to your datasource. The syntax is like `width: >200`, `height: <=300`, `cropped: yes` and `ratio: >1`.
 There is an optional thumbnail preview in entry overview tables.
