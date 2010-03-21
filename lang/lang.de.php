@@ -71,6 +71,6 @@
 		'Dies ist ein Pflichtfeld',
 
 		'No image found. Please upload an image and save entry.' => 
-		'Kein Bild gefunden. Bitte lade ein Bild hoch und speichere den Eintrag.',
+		'Kein Bild gefunden. Sie müssen zuerst ein Bild hochladen und den Eintrag speichern.',
 
 	);
