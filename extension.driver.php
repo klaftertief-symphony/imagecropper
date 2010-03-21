@@ -5,8 +5,9 @@
 		public function about(){
 			return array(
 				'name' => 'Field: Image Cropper',
-				'version' => '0.6',
-				'release-date' => '2010-01-24',
+				'type' => 'Field, Interface',
+				'version' => '1.0beta',
+				'release-date' => '2010-03-21',
 				'author' => array(
 					'name' => 'Jonas Coch',
 					'website' => 'http://klaftertief.de',

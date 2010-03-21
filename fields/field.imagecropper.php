@@ -373,7 +373,7 @@
 							$selected = ($ratio_float == $data['ratio']);
 							$options[] = array($ratio_float, $selected, $ratio);
 						}
-						$imagecropper_ratios = Widget::Label(__('Aspect Ratio'), NULL, 'imagecropper_ratios');
+						$imagecropper_ratios = Widget::Label(__('Aspect ratio'), NULL, 'imagecropper_ratios');
 						$imagecropper_ratios->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]', 'id' => 'imagecropper_'.$id.'_ratios')));
 						$imagecropper_ratio = 'select';
 					break;

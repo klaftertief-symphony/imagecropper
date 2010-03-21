@@ -2,12 +2,12 @@
 
 Image Cropper is a field extension for the Symphony CMS. It adds image cropping functionality to upload fields.
 
-* Version: 0.6
-* Date: 24th January 2010
+* Version: 1.0beta
+* Date: 21st March 2010
 * Author: Jonas Coch (jonas@klaftertief.de)
 * Repository: <http://github.com/klaftertief/imagecropper>
 * Requirements:
-	* Symphony CMS 2.0.6 or newer: <http://github.com/symphony/symphony-2>
+	* Symphony CMS 2.0.7 or newer: <http://github.com/symphony/symphony-2>
 	* Modified JIT Image Manipulation extension for frontend and entry list output: <http://github.com/klaftertief/jit_image_manipulation/tree/jCrop>
 
 This extension contains the following languages:
@@ -27,24 +27,30 @@ This extension contains the following languages:
 
 ## Documentation
 
-### Backend
-
-You can add a filter to your datasource. The syntax is like width: >200, height: <=300, cropped: yes and ratio: >1.
-There is an optional thumbnail preview in entry overview tables.
-
 ### Frontend
 
-The XML output is somethinge like
+The XML output is something like
 
-	<thumbnail cropped="yes" x1="519" x2="2003" y1="132" y2="1616" width="1484" height="1484" ratio="1" />
+	<thumbnail cropped="yes" x1="123" x2="723" y1="123" y2="523" width="600" height="400" ratio="1.5" />
 
-The jCrop mode of JIT expects a url like /image/4/crop_width/crop_height/crop_x/crop_y/resize_width/resize_height/path/to/image.jpg. resize_width and resize_height should either equal crop_width and crop_height (no resizing) or one should be 0 and the other smaller than the crop value (proportional resize).
+The jCrop mode of JIT expects a url like `/image/4/crop_width/crop_height/crop_x/crop_y/resize_width/resize_height/path/to/image.jpg`. `resize_width` and `resize_height` should either equal `crop_width` and `crop_height` (no resizing) or one should be 0 and the other smaller than the crop value (proportional resize).
+
+### Backend
+
+There needs to be an upload field in the section before you can add an imagecropper field.
+
+You can add a filter to your datasource. The syntax is like `width: >200`, `height: <=300`, `cropped: yes` and `ratio: >1`.
+There is an optional thumbnail preview in entry overview tables.
 
 ## Change Log
 
-Version 0.6 - 24th January 2010
+Version 1.0beta - 21st March 2010
 
-* first public version on Symphonys extension page
+* first public version
+
+## Known Issues
+
+There ist a bug/missing feature in jCrop that causes a wrong calculation of the minimum size when no ratio is set and the image is shown scaled down.
 
 ## Credits
 

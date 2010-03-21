@@ -2,6 +2,9 @@
  * ImageCropper for Symphony CMS
  *
  */
+Symphony.Language.add({
+		'No image found. Please upload an image and save entry.': false
+	});
 
 ;(function ($) {
 	$.fn.imageCropper = function (options) {
@@ -94,7 +97,7 @@
 				});
 			} else {
 				$('.group', $el).hide();
-				$el.append('No image found. Please upload an image and save entry.');
+				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
 			};
 
 		});
