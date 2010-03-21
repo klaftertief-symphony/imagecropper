@@ -21,6 +21,7 @@ Symphony.Language.add({
 				field_name = opts.related_field_name,
 				upload_field = $('input[name="fields['+field_name+']"]'),
 				image_link = upload_field.prev(),
+				remove_link = upload_field.next(),
 				box_width = options.box_width,
 				crop_coords = [];
 			var show_coords = function(c) {
@@ -33,6 +34,24 @@ Symphony.Language.add({
 				$('.imagecropper_height',el).val(c.h);
 				$('.imagecropper_free_ratio',el).val(Math.round(100 * c.w/c.h)/100);
 			};
+			var clear_coords = function(){
+				$('.imagecropper_cropped',el).val('no');
+				$('.imagecropper_x1',el).val('');
+				$('.imagecropper_y1',el).val('');
+				$('.imagecropper_x2',el).val('');
+				$('.imagecropper_y2',el).val('');
+				$('.imagecropper_width',el).val('');
+				$('.imagecropper_height',el).val('');
+				$('.imagecropper_free_ratio',el).val('');
+			};
+			
+			$(remove_link).click(function() {
+				jcrop_api.destroy();
+				clear_coords();
+				$('>.group',el).hide();
+				$('>img',el).remove();
+				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
+			});
 			
 			crop_coords = [Number($('.imagecropper_x1',el).val()), Number($('.imagecropper_y1',el).val()), Number($('.imagecropper_x2',el).val()), Number($('.imagecropper_y2',el).val())];
 			
@@ -84,30 +103,19 @@ Symphony.Language.add({
 					$('.imagecropper_clear', el).click(function(e) {
 						e.preventDefault();
 						jcrop_api.release();
-						$('.imagecropper_cropped',el).val('no');
-						$('.imagecropper_x1',el).val('');
-						$('.imagecropper_y1',el).val('');
-						$('.imagecropper_x2',el).val('');
-						$('.imagecropper_y2',el).val('');
-						$('.imagecropper_width',el).val('');
-						$('.imagecropper_height',el).val('');
-						$('.imagecropper_free_ratio',el).val('');
+						clear_coords();
 					});
 
 				});
 			} else {
 				$('.group', $el).hide();
 				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
+				clear_coords();
 			};
 
 		});
 	};
 	
-
-	function debug($obj) {
-		if (window.console && window.console.log)
-			window.console.log($obj);
-	};
 
 	$.fn.imageCropper.defaults = {
 	};
