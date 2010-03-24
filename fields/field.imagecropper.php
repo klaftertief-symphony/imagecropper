@@ -477,21 +477,23 @@
 		}
 
 		public function appendFormattedElement(&$wrapper, $data, $encode = false) {
+			
+			if ($data['cropped'] == 'yes') {
+				$imagecropper = new XMLElement($this->get('element_name'));
 
-			$imagecropper = new XMLElement($this->get('element_name'));
+				$imagecropper->setAttributeArray(array(
+					'cropped' => $data['cropped'],
+					'x1' => $data['x1'],
+					'x2' => $data['x2'],
+					'y1' => $data['y1'],
+					'y2' => $data['y2'],
+					'width' => $data['width'],
+					'height' => $data['height'],
+					'ratio' => $data['ratio']
+				));
 
-			$imagecropper->setAttributeArray(array(
-				'cropped' => $data['cropped'],
-				'x1' => $data['x1'],
-				'x2' => $data['x2'],
-				'y1' => $data['y1'],
-				'y2' => $data['y2'],
-				'width' => $data['width'],
-				'height' => $data['height'],
-				'ratio' => $data['ratio']
-			));
-
-			$wrapper->appendChild($imagecropper);
+				$wrapper->appendChild($imagecropper);
+			}
 
 		}
 
