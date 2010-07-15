@@ -16,7 +16,7 @@ Symphony.Language.add({
 			var
 				jcrop_api,
 				$select_ratio = $('#imagecropper_'+opts.field_id+'_ratios'),
-				aspect_ratio = null,
+				aspect_ratio = 0,
 				image = null,
 				field_name = opts.related_field_name,
 				upload_field = $('input[name="fields['+field_name+']"]'),
@@ -63,10 +63,10 @@ Symphony.Language.add({
 				aspect_ratio = opts.ratio;
 				if (aspect_ratio == 'select') {
 					if ($select_ratio.length) {
-						var calculated_ratio = Math.round(100 * Number($('.imagecropper_width',el).val()) / Number($('.imagecropper_height',el).val()));
-						aspect_ratio = $('option:selected',$select_ratio[0]).val();
+						aspect_ratio = $select_ratio.val();
 					};
 				};
+				aspect_ratio = Number(aspect_ratio);
 				
 				$(image).load(function() {
 					if (crop_coords.toString() == '0,0,0,0') {

@@ -205,7 +205,7 @@
 			} else {
 				$wrapper->appendChild($label);
 			};
-			$ratios = array('1/1','3/2','2/3','4/3','3/4','16/9');
+			$ratios = array('0','1/1','3/2','2/3','4/3','3/4','16/9');
 			$filter = new XMLElement('ul', NULL, array('class' => 'tags'));
 			foreach($ratios as $ratio) {
 				$filter->appendChild(new XMLElement('li', $ratio));
@@ -253,7 +253,7 @@
 				$ratios = array_map('trim', $ratios);
 				
 				foreach ($ratios as $ratio) {
-					if(!preg_match('/^\d+\/\d+$/', $ratio)) {
+					if(!preg_match('/^(\d+\/\d+|0)$/', $ratio)) {
 						$errors['ratios'] = __('Ratios have to be well formed.');
 					}
 				}
@@ -367,11 +367,16 @@
 						$options = array();
 						$pattern = '/(\D*)(\d+)(\s*)(\/|x|\*)(\s*)(\d+)(\D*)/';
 						foreach ($ratios as $index => $ratio) {
-							$dividend = preg_replace($pattern, '$2', $ratio);
-							$divisor = preg_replace($pattern, '$6', $ratio);
-							$ratio_float = round($dividend/$divisor,3);
-							$selected = ($ratio_float == $data['ratio']);
-							$options[] = array($ratio_float, $selected, $ratio);
+							if ($ratio == 0) {
+								$selected = ($ratio == $data['ratio']);
+								$options[] = array($ratio, $selected, __('Free cropping'));
+							} else {
+								$dividend = preg_replace($pattern, '$2', $ratio);
+								$divisor = preg_replace($pattern, '$6', $ratio);
+								$ratio_float = round($dividend/$divisor,3);
+								$selected = ($ratio_float == $data['ratio']);
+								$options[] = array($ratio_float, $selected, $ratio);
+							}
 						}
 						$imagecropper_ratios = Widget::Label(__('Aspect ratio'), NULL, 'imagecropper_ratios');
 						$imagecropper_ratios->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]', 'id' => 'imagecropper_'.$id.'_ratios')));

@@ -6,8 +6,8 @@
 			return array(
 				'name' => 'Field: Image Cropper',
 				'type' => 'Field, Interface',
-				'version' => '1.0beta',
-				'release-date' => '2010-03-21',
+				'version' => '1.0RC1',
+				'release-date' => '2010-07-06',
 				'author' => array(
 					'name' => 'Jonas Coch',
 					'website' => 'http://klaftertief.de',
