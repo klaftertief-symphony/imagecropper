@@ -3,7 +3,8 @@
  *
  */
 Symphony.Language.add({
-		'No image found. Please upload an image and save entry.': false
+		'No image found. Please upload an image and save entry.': false,
+		'This image is too small to get cropped with the current settings.': false
 	});
 
 ;(function ($) {
@@ -43,6 +44,35 @@ Symphony.Language.add({
 				$('.imagecropper_width',el).val('');
 				$('.imagecropper_height',el).val('');
 				$('.imagecropper_free_ratio',el).val('');
+			};
+			var checkMinDimension = function(){
+				var tooSmall;
+				
+				if (opts.minSize[0] == 0 && opts.minSize[1] == 0) {
+					tooSmall = false;
+				}
+				else if (opts.minSize[0] == 0) {
+					tooSmall = (image.width < opts.minSize[1] * aspect_ratio) || (image.height < opts.minSize[1]);
+				}
+				else if (opts.minSize[1] == 0) {
+					tooSmall = (image.width < opts.minSize[0]) || (image.height < (aspect_ratio == 0 ? 0 : opts.minSize[0] / aspect_ratio));
+				}
+				else {
+					tooSmall =  (image.width < opts.minSize[0]) || (image.height < opts.minSize[1]);
+				};
+				
+				if (tooSmall) {
+					if (!$('> .invalid', el).length) {
+						$el.prepend('<div class="invalid">' + Symphony.Language.get('This image is too small to get cropped with the current settings.') + '</div>');
+					};
+					jcrop_api.disable();
+					jcrop_api.release();
+					clear_coords();
+				}
+				else {
+					$('> .invalid', el).remove();
+					jcrop_api.enable();
+				};
 			};
 			
 			$(remove_link).click(function() {
@@ -92,11 +122,12 @@ Symphony.Language.add({
 
 					if ($select_ratio.length) {
 						$select_ratio.change(function() {
-							var selected_ratio = parseFloat($(this).val());
+							aspect_ratio = parseFloat($(this).val());
 							jcrop_api.setOptions({
-								aspectRatio: selected_ratio
+								aspectRatio: aspect_ratio
 							});
 							jcrop_api.focus();
+							checkMinDimension();
 						});
 					};
 
@@ -106,6 +137,7 @@ Symphony.Language.add({
 						clear_coords();
 					});
 
+					checkMinDimension();
 				});
 			} else {
 				$('.group', $el).hide();
