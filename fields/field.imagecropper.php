@@ -463,8 +463,9 @@
 			if ($data['cropped'] == 'yes') {
 				$entryManager = new EntryManager($this->_engine);
 				$entries = $entryManager->fetch($entry_id);
-
-				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/0/75'. $entries[0]->_data[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
+				
+				$entryData = $entries[0]->getData();
+				$image = '<img src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/0/75'. $entryData[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
 			} else {
 				return parent::prepareTableValue(NULL);
 			}
