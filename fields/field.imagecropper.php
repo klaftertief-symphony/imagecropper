@@ -338,35 +338,25 @@
 			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
 
 			// hidden inputs
-			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'no', 'hidden', array('class' => 'imagecropper_cropped'));
+			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'no', 'hidden');
 			$label->appendChild($cropped);
-			$x1 = Widget::Input($fieldname.'[x1]', $data['x1'], 'hidden', array('class' => 'imagecropper_x1'));
+			$x1 = Widget::Input($fieldname.'[x1]', $data['x1'], 'hidden');
 			$label->appendChild($x1);
-			$x2 = Widget::Input($fieldname.'[x2]', $data['x2'], 'hidden', array('class' => 'imagecropper_x2'));
+			$x2 = Widget::Input($fieldname.'[x2]', $data['x2'], 'hidden');
 			$label->appendChild($x2);
-			$y1 = Widget::Input($fieldname.'[y1]', $data['y1'], 'hidden', array('class' => 'imagecropper_y1'));
+			$y1 = Widget::Input($fieldname.'[y1]', $data['y1'], 'hidden');
 			$label->appendChild($y1);
-			$y2 = Widget::Input($fieldname.'[y2]', $data['y2'], 'hidden', array('class' => 'imagecropper_y2'));
+			$y2 = Widget::Input($fieldname.'[y2]', $data['y2'], 'hidden');
 			$label->appendChild($y2);
-			$width = Widget::Input($fieldname.'[width]', $data['width'], 'hidden', array('class' => 'imagecropper_width'));
+			$width = Widget::Input($fieldname.'[width]', $data['width'], 'hidden');
 			$label->appendChild($width);
-			$height = Widget::Input($fieldname.'[height]', $data['height'], 'hidden', array('class' => 'imagecropper_height'));
+			$height = Widget::Input($fieldname.'[height]', $data['height'], 'hidden');
 			$label->appendChild($height);
 
 			$wrapper->appendChild($label);
 
 			// main imagecropper container
 			$imagecropper = new XMLElement('div', NULL, array('class' => 'frame imagecropper'));
-			// data for imagecropper JS options
-			// (can't use a single JSON object because attribute values are always with double qoutes)
-			$imagecropper->setAttributeArray(array(
-				'data-field_id' => $id,
-				'data-related_field_id' => $this->get('related_field_id'),
-				'data-related_field_name' => $related_field->get('element_name'),
-				'data-ratio' => $imagecropper_ratio,
-				'data-minSize' => '['.$this->get('min_width').','.$this->get('min_height').']',
-			));
-			$imagecropper->setAttribute('data-options', $options);
 			
 			// group for action links and aspect ratio select box
 			$group = new XMLElement('div', NULL, array('class' => 'group'));
@@ -389,14 +379,14 @@
 				switch ($number_of_ratios) {
 					case 0:
 						$imagecropper_ratio = NULL;
-						$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
-						$aspect_ratio->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
+						$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden'));
+						$aspect_ratio->appendChild(new XMLElement('p', __('Free cropping')));
 					break;
 					case 1:
 						if (in_array(0,$ratios)) {
 							$imagecropper_ratio = NULL;
-							$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
-							$aspect_ratio->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
+							$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden'));
+							$aspect_ratio->appendChild(new XMLElement('p', __('Free cropping')));
 							break;
 						}
 						$pattern = '/(\D*)(\d+)(\s*)(\/|x|\*)(\s*)(\d+)(\D*)/';
@@ -404,7 +394,7 @@
 						$divisor = preg_replace($pattern, '$6', $ratios[0]);
 						$imagecropper_ratio = round($dividend/$divisor,3);
 						$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', $imagecropper_ratio, 'hidden'));
-						$aspect_ratio->appendChild(new XMLElement('p', __('Fixed at ').$ratios[0], array('class' => 'help')));
+						$aspect_ratio->appendChild(new XMLElement('p', __('Fixed at ').$ratios[0]));
 					break;
 					default:
 						$imagecropper_ratio = 'select';
@@ -422,11 +412,21 @@
 								$options[] = array($ratio_float, $selected, $ratio);
 							}
 						}
-						$aspect_ratio->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]', 'id' => 'imagecropper_'.$id.'_ratios')));
+						$aspect_ratio->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]')));
 					break;
 				}
 			}
 			$group->appendChild($aspect_ratio);
+
+			// data for imagecropper JS options
+			// (can't use a single JSON object because attribute values are always with double qoutes)
+			$imagecropper->setAttributeArray(array(
+				'data-field_name' => $fieldname,
+				'data-field_id' => $id,
+				'data-related_field_id' => $this->get('related_field_id'),
+				'data-ratio' => $imagecropper_ratio,
+				'data-min_size' => '['.$this->get('min_width').','.$this->get('min_height').']',
+			));
 
 			$imagecropper->appendChild($group);
 
