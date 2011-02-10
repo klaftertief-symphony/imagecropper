@@ -177,7 +177,7 @@
 
 			// related field
 			$label = Widget::Label(__('Related upload field'), NULL);
-			$fieldManager = new FieldManager($this->_engine);
+			$fieldManager = new FieldManager(Symphony::Engine());
 			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="advancedupload")');
 			$options = array(
 				array('', false, __('None Selected'), ''),
@@ -236,7 +236,7 @@
 		function checkFields(&$errors, $checkForDuplicates=true) {
 			// check for presence of upload fields
 			$section_id = Administration::instance()->Page->_context[1];
-			$fieldManager = new FieldManager($this->_engine);
+			$fieldManager = new FieldManager(Symphony::Engine());
 			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
 			if(empty($fields)) {
 				$errors['related_field_id'] = __('There is no upload field in this section. You have to save the section with an upload field before you can add an image cropper field.');
@@ -294,12 +294,12 @@
 				}
 			}
 
-			$this->_engine->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
-			return $this->_engine->Database->insert($fields, 'tbl_fields_' . $this->handle());
+			Symphony::Engine()->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
+			return Symphony::Engine()->Database->insert($fields, 'tbl_fields_' . $this->handle());
 		}
 
 		function createTable(){
-			return $this->_engine->Database->query(
+			return Symphony::Engine()->Database->query(
 				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
 				`id` int(11) unsigned NOT NULL auto_increment,
 				`entry_id` int(11) unsigned NOT NULL,
@@ -319,51 +319,95 @@
 
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL) {
 
+			// append assets
 			$assets_path = '/extensions/imagecropper/assets/';
-			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/jquery.Jcrop.css', 'screen', 120, false);
-			$this->_engine->Page->addStylesheetToHead(URL . $assets_path . 'css/publish.css', 'screen', 140, false);
-			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/jquery.Jcrop.min.js', 430, false);
-			$this->_engine->Page->addScriptToHead(URL . $assets_path . 'js/imagecropper.js', 460, false);
+			Symphony::Engine()->Page->addStylesheetToHead(URL . $assets_path . 'css/jquery.Jcrop.css', 'screen', 120, false);
+			Symphony::Engine()->Page->addStylesheetToHead(URL . $assets_path . 'css/publish.css', 'screen', 140, false);
+			Symphony::Engine()->Page->addScriptToHead(URL . $assets_path . 'js/jquery.Jcrop.min.js', 430, false);
+			Symphony::Engine()->Page->addScriptToHead(URL . $assets_path . 'js/imagecropper.js', 460, false);
 
+			// initialize som variables
 			$id = $this->get('id');
 			$related_field_id = $this->get('related_field_id');
-			$fieldname = 'fields['.$this->get('element_name').']';
+			$fieldname = 'fields' . $fieldnamePrefix . '['. $this->get('element_name') . ']' . $fieldnamePostfix;
+			$fieldManager = new FieldManager(Symphony::Engine());
+			$related_field = $fieldManager->fetch($this->get('related_field_id'));
+
+			// main field label
+			$label = Widget::Label($this->get('label'));
+			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
+
+			// hidden inputs
+			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'no', 'hidden', array('class' => 'imagecropper_cropped'));
+			$label->appendChild($cropped);
+			$x1 = Widget::Input($fieldname.'[x1]', $data['x1'], 'hidden', array('class' => 'imagecropper_x1'));
+			$label->appendChild($x1);
+			$x2 = Widget::Input($fieldname.'[x2]', $data['x2'], 'hidden', array('class' => 'imagecropper_x2'));
+			$label->appendChild($x2);
+			$y1 = Widget::Input($fieldname.'[y1]', $data['y1'], 'hidden', array('class' => 'imagecropper_y1'));
+			$label->appendChild($y1);
+			$y2 = Widget::Input($fieldname.'[y2]', $data['y2'], 'hidden', array('class' => 'imagecropper_y2'));
+			$label->appendChild($y2);
+			$width = Widget::Input($fieldname.'[width]', $data['width'], 'hidden', array('class' => 'imagecropper_width'));
+			$label->appendChild($width);
+			$height = Widget::Input($fieldname.'[height]', $data['height'], 'hidden', array('class' => 'imagecropper_height'));
+			$label->appendChild($height);
+
+			$wrapper->appendChild($label);
+
+			// main imagecropper container
+			$imagecropper = new XMLElement('div', NULL, array('class' => 'frame imagecropper'));
+			// data for imagecropper JS options
+			// (can't use a single JSON object because attribute values are always with double qoutes)
+			$imagecropper->setAttributeArray(array(
+				'data-field_id' => $id,
+				'data-related_field_id' => $this->get('related_field_id'),
+				'data-related_field_name' => $related_field->get('element_name'),
+				'data-ratio' => $imagecropper_ratio,
+				'data-minSize' => '['.$this->get('min_width').','.$this->get('min_height').']',
+			));
+			$imagecropper->setAttribute('data-options', $options);
+			
+			// group for action links and aspect ratio select box
+			$group = new XMLElement('div', NULL, array('class' => 'group'));
+
+			$actions = Widget::Label(__('Actions'));
+			$list = new XMLElement('ul');
+			$list_item = new XMLElement('li');
+			$list_item->appendChild(Widget::Anchor(__('Reset'), '#', __('Reset all values'), 'imagecropper_clear'));
+			$list->appendChild($list_item);
+			$list_item = new XMLElement('li');
+			$list_item->appendChild(Widget::Anchor(__('Show preview'), '#', __('Show preview in new window'), 'imagecropper_preview'));
+			$list->appendChild($list_item);
+			$actions->appendChild($list);
+			$group->appendChild($actions);
 
 			$ratios = array_unique(explode(',',$this->get('ratios')));
-			$imagecropper_ratios = NULL;
-			$imagecropper_ratio = NULL;
+			$aspect_ratio = Widget::Label(__('Aspect ratio'));
 			if(is_array($ratios)) {
 				$number_of_ratios = count($ratios);
 				switch ($number_of_ratios) {
 					case 0:
 						$imagecropper_ratio = NULL;
-						$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
-						$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
-						$imagecropper_ratios->appendChild($label);
-						$imagecropper_ratios->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
-						$imagecropper_ratios->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
+						$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
+						$aspect_ratio->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
 					break;
 					case 1:
 						if (in_array(0,$ratios)) {
 							$imagecropper_ratio = NULL;
-							$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
-							$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
-							$imagecropper_ratios->appendChild($label);
-							$imagecropper_ratios->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
-							$imagecropper_ratios->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
+							$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', NULL, 'hidden', array('class' => 'imagecropper_free_ratio')));
+							$aspect_ratio->appendChild(new XMLElement('p', __('Free cropping'), array('class' => 'help')));
 							break;
 						}
 						$pattern = '/(\D*)(\d+)(\s*)(\/|x|\*)(\s*)(\d+)(\D*)/';
 						$dividend = preg_replace($pattern, '$2', $ratios[0]);
 						$divisor = preg_replace($pattern, '$6', $ratios[0]);
 						$imagecropper_ratio = round($dividend/$divisor,3);
-						$imagecropper_ratios = new XMLElement('div', NULL, array('class' => 'label'));
-						$label = new XMLElement('h3', __('Aspect ratio'), array('class' => 'label'));
-						$imagecropper_ratios->appendChild($label);
-						$imagecropper_ratios->appendChild(Widget::Input($fieldname.'[ratio]', $imagecropper_ratio, 'hidden'));
-						$imagecropper_ratios->appendChild(new XMLElement('p', __('Fixed at ').$ratios[0], array('class' => 'help')));
+						$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', $imagecropper_ratio, 'hidden'));
+						$aspect_ratio->appendChild(new XMLElement('p', __('Fixed at ').$ratios[0], array('class' => 'help')));
 					break;
 					default:
+						$imagecropper_ratio = 'select';
 						$options = array();
 						$pattern = '/(\D*)(\d+)(\s*)(\/|x|\*)(\s*)(\d+)(\D*)/';
 						foreach ($ratios as $index => $ratio) {
@@ -378,90 +422,26 @@
 								$options[] = array($ratio_float, $selected, $ratio);
 							}
 						}
-						$imagecropper_ratios = Widget::Label(__('Aspect ratio'), NULL, 'imagecropper_ratios');
-						$imagecropper_ratios->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]', 'id' => 'imagecropper_'.$id.'_ratios')));
-						$imagecropper_ratio = 'select';
+						$aspect_ratio->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]', 'id' => 'imagecropper_'.$id.'_ratios')));
 					break;
 				}
 			}
+			$group->appendChild($aspect_ratio);
 
-			$imagecropper = new XMLElement('div', NULL, array('class' => 'label'));
-			$label = new XMLElement('h3', $this->get('label'), array('class' => 'label'));
-			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
-			$imagecropper->appendChild($label);
+			$imagecropper->appendChild($group);
 
-			$span = new XMLElement('span', NULL, array('id' => 'imagecropper_' . $id));
-			$group = new XMLElement('div', NULL, array('class' => 'group'));
-
-			$actions = new XMLElement('div', NULL, array('class' => 'imagecropper_actions'));
-			$actions_description = new XMLElement('h3', __('Actions'), array('class' => 'label'));
-			$actions_actions = new XMLElement('ul', NULL, array('class' => 'group'));
-			$clear_values = new XMLElement('li');
-			$clear_values->appendChild(Widget::Anchor(__('Reset'), '#', __('Reset all values'), 'imagecropper_clear'));
-			$actions_actions->appendChild($clear_values);
-			$actions->appendChild($actions_description);
-			$actions->appendChild($actions_actions);
-			$group->appendChild($actions);
-			$group->appendChild($imagecropper_ratios);
-
-			$cropped = Widget::Input($fieldname.'[cropped]', $data['cropped'] ? $data['cropped'] : 'no', 'hidden', array('class' => 'imagecropper_cropped'));
-			$group->appendChild($cropped);
-
-			$x1 = Widget::Input($fieldname.'[x1]', $data['x1'], 'hidden', array('class' => 'imagecropper_x1'));
-			$group->appendChild($x1);
-
-			$x2 = Widget::Input($fieldname.'[x2]', $data['x2'], 'hidden', array('class' => 'imagecropper_x2'));
-			$group->appendChild($x2);
-
-			$y1 = Widget::Input($fieldname.'[y1]', $data['y1'], 'hidden', array('class' => 'imagecropper_y1'));
-			$group->appendChild($y1);
-
-			$y2 = Widget::Input($fieldname.'[y2]', $data['y2'], 'hidden', array('class' => 'imagecropper_y2'));
-			$group->appendChild($y2);
-
-			$width = Widget::Input($fieldname.'[width]', $data['width'], 'hidden', array('class' => 'imagecropper_width'));
-			$group->appendChild($width);
-
-			$height = Widget::Input($fieldname.'[height]', $data['height'], 'hidden', array('class' => 'imagecropper_height'));
-			$group->appendChild($height);
-
-			$span->appendChild($group);
-
-			$imagecropper->appendChild($span);
-
+			// appen field to wrapper
 			if ($flagWithError != NULL) {
 				$wrapper->appendChild(Widget::wrapFormElementWithError($imagecropper, $flagWithError));
 			}
 			else {
 				$wrapper->appendChild($imagecropper);
 			}
-
-			$fieldManager = new FieldManager($this->_engine);
-			$related_field = $fieldManager->fetch($this->get('related_field_id'));
-			$script = new XMLElement('script');
-			$options = '
-				field_id: '.$id.',
-				related_field_id: '.$this->get('related_field_id').',
-				related_field_name: "'.$related_field->get('element_name').'",
-				ratio: "'.$imagecropper_ratio.'",
-				minSize: ['.$this->get('min_width').','.$this->get('min_height').'],
-			';
-			$function_call = '
-				jQuery(document).ready(function ($) {
-					$("#imagecropper_'.$id.'").imageCropper({'
-						.$options.
-					'});
-				});
-			';
-			$script->setAttributeArray(array('type' => 'text/javascript'));
-			$script->setValue($function_call);
-			$this->_engine->Page->addElementToHead($script, 460);
-
 		}
 
 		function prepareTableValue($data, XMLElement $link=NULL, $entry_id){
 			if ($data['cropped'] == 'yes') {
-				$entryManager = new EntryManager($this->_engine);
+				$entryManager = new EntryManager(Symphony::Engine());
 				$entries = $entryManager->fetch($entry_id);
 				
 				$entryData = $entries[0]->getData();

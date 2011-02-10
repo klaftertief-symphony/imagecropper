@@ -8,10 +8,12 @@ Symphony.Language.add({
 	});
 
 ;(function ($) {
+
 	$.fn.imageCropper = function (options) {
 		return this.each(function() {
 			var el = this;
 			var $el = $(this);
+			var $field = $el.parent();
 			options = options || {};
 			var opts = $.extend({}, $.fn.imageCropper.defaults, options);
 			var
@@ -26,24 +28,24 @@ Symphony.Language.add({
 				box_width = options.box_width,
 				crop_coords = [];
 			var show_coords = function(c) {
-				$('.imagecropper_cropped',el).val('yes');
-				$('.imagecropper_x1',el).val(c.x);
-				$('.imagecropper_y1',el).val(c.y);
-				$('.imagecropper_x2',el).val(c.x2);
-				$('.imagecropper_y2',el).val(c.y2);
-				$('.imagecropper_width',el).val(c.w);
-				$('.imagecropper_height',el).val(c.h);
-				$('.imagecropper_free_ratio',el).val(Math.round(100 * c.w/c.h)/100);
+				$field.find('.imagecropper_cropped').val('yes');
+				$field.find('.imagecropper_x1').val(c.x);
+				$field.find('.imagecropper_y1').val(c.y);
+				$field.find('.imagecropper_x2').val(c.x2);
+				$field.find('.imagecropper_y2').val(c.y2);
+				$field.find('.imagecropper_width').val(c.w);
+				$field.find('.imagecropper_height').val(c.h);
+				$field.find('.imagecropper_free_ratio').val(Math.round(100 * c.w/c.h)/100);
 			};
 			var clear_coords = function(){
-				$('.imagecropper_cropped',el).val('no');
-				$('.imagecropper_x1',el).val('');
-				$('.imagecropper_y1',el).val('');
-				$('.imagecropper_x2',el).val('');
-				$('.imagecropper_y2',el).val('');
-				$('.imagecropper_width',el).val('');
-				$('.imagecropper_height',el).val('');
-				$('.imagecropper_free_ratio',el).val('');
+				$field.find('.imagecropper_cropped').val('no');
+				$field.find('.imagecropper_x1').val('');
+				$field.find('.imagecropper_y1').val('');
+				$field.find('.imagecropper_x2').val('');
+				$field.find('.imagecropper_y2').val('');
+				$field.find('.imagecropper_width').val('');
+				$field.find('.imagecropper_height').val('');
+				$field.find('.imagecropper_free_ratio').val('');
 			};
 			var checkMinDimension = function(){
 				var tooSmall;
@@ -83,7 +85,7 @@ Symphony.Language.add({
 				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
 			});
 			
-			crop_coords = [Number($('.imagecropper_x1',el).val()), Number($('.imagecropper_y1',el).val()), Number($('.imagecropper_x2',el).val()), Number($('.imagecropper_y2',el).val())];
+			crop_coords = [Number($field.find('.imagecropper_x1').val()), Number($field.find('.imagecropper_y1').val()), Number($field.find('.imagecropper_x2').val()), Number($field.find('.imagecropper_y2').val())];
 			
 			if (image_link.length) {
 				box_width = $el.width();
@@ -148,16 +150,22 @@ Symphony.Language.add({
 		});
 	};
 	
-
 	$.fn.imageCropper.defaults = {
 	};
 	
+	$(document).ready(function() {
+		$('.imagecropper').each(function(index) {
+			var $this = $(this),
+				options = {
+					field_id: $this.data('field_id'),
+					related_field_id: $this.data('related_field_id'),
+					related_field_name: $this.data('related_field_name'),
+					ratio: $this.data('ratio'),
+					minSize: $this.data('minSize')
+				};
+				
+			$this.imageCropper(options);
+		});
+	});
+
 })(jQuery.noConflict());
-
-
-// A handler to kill the action (from Jcrop demo)
-function nothing(e) {
-	e.stopPropagation();
-	e.preventDefault();
-	return false;
-};

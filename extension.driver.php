@@ -36,23 +36,4 @@
 			Symphony::Database()->query("DROP TABLE `tbl_fields_imagecropper`");
 		}
 		
-		public function getSubscribedDelegates(){
-			return array(
-				array(
-					'page' => '/administration/',
-					'delegate' => 'AdminPagePreGenerate',
-					'callback' => '__appendAssets'
-				)
-			);
-		}
-		
-		
-		public function __appendAssets($context) {
-			$assets_path = '/extensions/imagecropper/assets/';
-			if (Administration::instance()->Page instanceof contentPublish) {
-				Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'css/publish.css', 'screen', 130, false);
-			}
-		}
-		
-		
 	}
