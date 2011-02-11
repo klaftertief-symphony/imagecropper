@@ -2,8 +2,8 @@
 
 Image Cropper is a field extension for the Symphony CMS. It adds image cropping functionality to upload fields.
 
-* Version: 1.0beta
-* Date: 21st March 2010
+* Version: 1.0
+* Date: 2011-02-11
 * Author: Jonas Coch (jonas@klaftertief.de)
 * Repository: <http://github.com/klaftertief/imagecropper>
 * Requirements:
@@ -44,13 +44,19 @@ There is an optional thumbnail preview in entry overview tables.
 
 ## Change Log
 
-Version 1.0beta - 21st March 2010
+### Version 1.0 - 2011-02-11
+
+* Symphony 2.2 compatibility
+* "Create URL" functionality
+* Style fixes
+
+### Version 1.0beta - 2011-02-11
 
 * first public version
 
 ## Known Issues
 
-There ist a bug/missing feature in jCrop that causes a wrong calculation of the minimum size when no ratio is set and the image is shown scaled down.
+There ist a bug/missing feature in jCrop that causes a wrong calculation of the minimum size when no ratio is set and the image is scaled down.
 
 ## Credits
 

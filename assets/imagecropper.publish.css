@@ -1,0 +1,46 @@
+.field-imagecropper div.frame {
+	margin: -1.5em 0 1.5em 0;
+	padding: 12px;
+	border: 1px solid #e4e4de;
+	background-color: #f5f5f3;
+}
+	.field-imagecropper div.frame label {
+		margin-top: 0;
+	}
+		.field-imagecropper div.frame label p {
+			margin: 0;
+		}
+		.field-imagecropper div.frame label ul {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+			.field-imagecropper div.frame label ul li {
+				display: inline;
+				margin-right: 1em;
+			}
+
+	.field-imagecropper div.frame fieldset.imagecropper_preview {
+		border-top: 1px solid #e4e4de;
+		display: none;
+	}
+		.field-imagecropper div.frame fieldset.imagecropper_preview .imagecropper_scale_slider {
+			display: block;
+			margin-top: 0.6em;
+		}
+		.field-imagecropper div.frame fieldset.imagecropper_preview .group > * {
+			width: 30%
+		}
+		.field-imagecropper div.frame fieldset.imagecropper_preview .group > *:first-child {
+			width: 70%;
+		}
+		.field-imagecropper div.frame fieldset.imagecropper_preview .help {
+			margin: -0.75em 0 0.75em 0;
+		}
+
+.field-imagecropper .invalid div.frame {
+	margin-bottom: 0;
+	background-color: #d42;
+	border: 1px solid #c31;
+	border-bottom-width: 0;
+}

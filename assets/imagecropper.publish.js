@@ -7,7 +7,9 @@
 	$(document).ready(function() {
 		Symphony.Language.add({
 			'No image found. Please upload an image and save entry.': false,
-			'This image is too small to get cropped with the current settings.': false
+			'This image is too small to get cropped with the current settings.': false,
+			'Show URL': false,
+			'Hide URL': false
 		});
 
 		$('.imagecropper').each(function(index) {
@@ -42,19 +44,28 @@
 				$height_input = $field.find('input[name="' + field_prefix + '\\[height\\]"]'),
 				$ratio_input = $field.find('input[name="' + field_prefix + '\\[ratio\\]"]'),
 				$ratio_select = $el.find('select[name="' + field_prefix + '\\[ratio\\]"]'),
+				$clear_link = $el.find('a.imagecropper_clear'),
+				$preview_toggle = $el.find('a.imagecropper_preview_toggle'),
+				$preview_fieldset = $el.find('fieldset.imagecropper_preview'),
+				$preview_url_input = $preview_fieldset.find('input[name="' + field_prefix + '\\[preview_url\\]"]'),
+				$preview_scale = $preview_fieldset.find('.imagecropper_scale'),
+				$preview_scale_input = $preview_fieldset.find('input[name="' + field_prefix + '\\[preview_scale\\]"]').hide(),
+				$preview_scale_slider = $preview_fieldset.find('.imagecropper_scale_slider'),
+				$preview_link = $preview_fieldset.find('a.imagecropper_preview_link'),
+				$upload_field = $('#field-' + o.related_field_id).find('input'),
+				$image_link = $upload_field.prev(),
+				$remove_link = $upload_field.next(),
 				cropper,
 				aspect_ratio = 0,
+				image_path = $upload_field.val(),
 				image = null,
-				upload_field = $('#field-' + o.related_field_id).find('input'),
-				image_link = upload_field.prev(),
-				remove_link = upload_field.next(),
 				box_width = o.box_width,
 				crop_coords = [Number($x1_input.val()), Number($y1_input.val()), Number($x2_input.val()), Number($y2_input.val())];
 			
-			if (image_link.length) {
+			if ($image_link.length) {
 				box_width = $el.width();
 				image = new Image();
-				image.src = image_link.attr('href');
+				image.src = $image_link.attr('href');
 				
 				aspect_ratio = o.ratio;
 				if (aspect_ratio == 'select') {
@@ -97,30 +108,71 @@
 						});
 					};
 
-					$('.imagecropper_clear', el).click(function(e) {
-						e.preventDefault();
-						cropper.release();
-						clear_coords();
-					});
-
 					checkMinDimension();
 				});
 			} else {
-				$('.group', $el).hide();
+				$el.find('.group').hide();
+				$el.find('fieldset').hide();
 				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
-				clear_coords();
+				clearCoords();
 			};
 
-			$(remove_link).click(function() {
+			$clear_link.click(function(e) {
+				e.preventDefault();
+				cropper.release();
+				clearCoords();
+			});
+
+			$preview_toggle.toggle(function(e) {
+				e.preventDefault();
+				$preview_fieldset.slideDown(200);
+				$(this).text(Symphony.Language.get('Hide URL'));
+			}, function(e) {
+				e.preventDefault();
+				$preview_fieldset.slideUp(200);
+				$(this).text(Symphony.Language.get('Show URL'));
+			});
+			
+			$preview_link.click(function(e) {
+				e.preventDefault();
+				var scale = $preview_scale_input.val() / 100,
+					width = $width_input.val() * scale,
+					height = $height_input.val() * scale;
+				
+				window.open($preview_url_input.val(), 'imagecropper_preview', 'height=' + height + ',width=' + width);
+			});
+			
+			$preview_scale_slider.slider({
+				value: $preview_scale_input.val(),
+				min: 0,
+				max: 100,
+				create: function() {
+					$preview_scale.text($preview_scale_input.val() + '%');
+				},
+				slide: function(event, ui) {
+					var c = cropper.tellSelect();
+					
+					$preview_scale_input.val(ui.value);
+					$preview_scale.text(ui.value + '%');
+					showCoords(c);
+				}
+			});
+			
+			$remove_link.click(function() {
 				cropper.destroy();
 				clearCoords();
-				$('>.group',el).hide();
-				$('>img',el).remove();
+				$el.find('.group').hide();
+				$el.find('fieldset').hide();
+				$el.find('img').remove();
 				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
 			});
 			
 			// private methods
 			function showCoords(c) {
+				var scale = $preview_scale_input.val() / 100,
+					scaled_width = Math.round(c.w * scale),
+					scaled_height = Math.round(c.h * scale);
+				
 				$cropped_input.val('yes');
 				$x1_input.val(c.x);
 				$y1_input.val(c.y);
@@ -129,6 +181,7 @@
 				$width_input.val(c.w);
 				$height_input.val(c.h);
 				$ratio_input.val(Math.round(100 * c.w/c.h)/100);
+				$preview_url_input.val(Symphony.Context.get('root') + '/image/4/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + image_path);
 			};
 			
 			function clearCoords(){
@@ -138,9 +191,11 @@
 				$x2_input.val('');
 				$y2_input.val('');
 				$width_input.val('');
-				$height_inputval('');
+				$height_input.val('');
 				$ratio_input.val('');
+				$preview_url_input.val('');
 			};
+			
 			function checkMinDimension(){
 				var tooSmall;
 				
@@ -158,18 +213,19 @@
 				};
 				
 				if (tooSmall) {
-					if (!$('> .invalid', el).length) {
-						$el.prepend('<div class="invalid">' + Symphony.Language.get('This image is too small to get cropped with the current settings.') + '</div>');
+					if (!$field.find('#error').length) {
+						$el.wrap('<div id="error" class="invalid"></div>');
+						$el.after('<p>' + Symphony.Language.get('This image is too small to get cropped with the current settings.') + '</p>');
 					};
 					cropper.disable();
 					cropper.release();
 					clearCoords();
-				}
-				else {
-					$('> .invalid', el).remove();
-					cropper.enable();
 				};
 			};
+			
+			function nothing () {
+				return false;
+			}
 		});
 	};
 	
