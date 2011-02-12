@@ -3,7 +3,7 @@
 Image Cropper is a field extension for the Symphony CMS. It adds image cropping functionality to upload fields.
 
 * Version: 1.0
-* Date: 2011-02-11
+* Date: 2011-02-12
 * Author: Jonas Coch (jonas@klaftertief.de)
 * Repository: <http://github.com/klaftertief/imagecropper>
 * Requirements:

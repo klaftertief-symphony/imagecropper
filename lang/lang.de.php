@@ -7,10 +7,12 @@
 			'email' => 'jonas@klaftertief.de',
 			'website' => 'http://klaftertief.de'
 		),
-		'release-date' => '2010-03-21',
+		'release-date' => '2011-02-12'
 	);
 
-
+	/**
+	 * Field: Image Cropper
+	 */
 	$dictionary = array(
 
 		'"%1$s" needs to have a height of at least %2$spx.' => 
@@ -43,11 +45,11 @@
 		'Minimum width <i>Optional</i>' => 
 		'Mindestbreite <i>Optional</i>',
 
+		'No image found. Please upload an image and save entry.' => 
+		'Kein Bild gefunden. Sie müssen zuerst ein Bild hochladen und den Eintrag speichern.',
+
 		'None Selected' => 
 		'Keins ausgewählt',
-
-		'Optional' => 
-		'Optional',
 
 		'Ratios have to be well formed.' => 
 		'Seitenverhältnisse müssen richtig formatiert sein.',
@@ -67,10 +69,34 @@
 		'This has to be an integer.' => 
 		'Dieses muß eine Ganze Zahl sein.',
 
-		'This is a required field.' => 
-		'Dies ist ein Pflichtfeld',
+		'This image is too small to get cropped with the current settings.' => 
+		'Dieses Bild ist zu klein, um mit den momentanen Einstellungen beschnitten werden zu können.',
 
-		'No image found. Please upload an image and save entry.' => 
-		'Kein Bild gefunden. Sie müssen zuerst ein Bild hochladen und den Eintrag speichern.',
+		'Show URL' => 
+		'Zeige URL',
+
+		'Hide URL' => 
+		'Verstecke URL',
+
+		'Leave empty for free cropping or add <code>0</code> to add an option for free cropping.' => 
+		'Lasse dies Feld leer für eine freie Auswahl des Bildausschnitts oder füge <code>0</code> hinzu um eine Option für einen freien Bildausschnitt zu erzeugen.',
+
+		'Set minimum dimensions for the cropped image.' => 
+		'Setze minimale Dimensionen für das beschnittene Bild.',
+
+		'Preview' => 
+		'Vorschau',
+
+		'Open current detail of the image in a new window' => 
+		'Öffne den aktuellen Bildausschnitt in einem neuen Fenster',
+
+		'Show URL of the current detail' => 
+		'Zeige die URL des aktuellen Bildausschnitts',
+
+		'Scale' => 
+		'Skalieren',
+
+		'You can scale the image down before previewing it or copying its URL.' => 
+		'Du kannst den Bildausschnitt vor der Vorschau oder dem Kopieren der URL verkleinern.',
 
 	);

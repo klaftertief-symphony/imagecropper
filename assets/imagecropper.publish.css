@@ -11,12 +11,12 @@
 		.field-imagecropper div.frame label p {
 			margin: 0;
 		}
-		.field-imagecropper div.frame label ul {
+		.field-imagecropper div.frame ul {
 			margin: 0;
 			padding: 0;
 			list-style: none;
 		}
-			.field-imagecropper div.frame label ul li {
+			.field-imagecropper div.frame ul li {
 				display: inline;
 				margin-right: 1em;
 			}
@@ -36,7 +36,9 @@
 			width: 70%;
 		}
 		.field-imagecropper div.frame fieldset.imagecropper_preview .help {
-			margin: -0.75em 0 0.75em 0;
+			margin-bottom: 0;
+			position: relative;
+			top: -0.75em;
 		}
 
 .field-imagecropper .invalid div.frame {
