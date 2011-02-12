@@ -467,9 +467,9 @@
 				'data-related_field_id' => $this->get('related_field_id'),
 				'data-ratio' => $imagecropper_ratio,
 				'data-min_size' => '['.$this->get('min_width').','.$this->get('min_height').']',
-				'data-image-file' => $imageData['file'],
-				'data-image-width' => $imageMeta['width'],
-				'data-image-height' => $imageMeta['height'],
+				'data-image_file' => $imageData['file'],
+				'data-image_width' => $imageMeta['width'],
+				'data-image_height' => $imageMeta['height'],
 			));
 
 			// appen field to wrapper

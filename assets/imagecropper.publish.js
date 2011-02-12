@@ -19,7 +19,10 @@
 					field_id: $this.data('field_id'),
 					related_field_id: $this.data('related_field_id'),
 					ratio: $this.data('ratio'),
-					minSize: $this.data('min_size')
+					min_size: $this.data('min_size'),
+					image_width: $this.data('image_width'),
+					image_height: $this.data('image_height'),
+					image_file: $this.data('image_file')
 				};
 				
 			$this.imageCropper(options);
@@ -56,73 +59,35 @@
 				$image_link = $upload_field.prev(),
 				$remove_link = $upload_field.next(),
 				cropper,
-				aspect_ratio = 0,
-				image_path = $upload_field.val(),
-				image = null,
-				box_width = o.box_width,
+				aspect_ratio = o.ratio,
+				$image,
+				image_path,
+				box_width = $el.width(),
+				resize_width,
+				resize_height,
 				crop_coords = [Number($x1_input.val()), Number($y1_input.val()), Number($x2_input.val()), Number($y2_input.val())];
 			
 			if ($image_link.length) {
-				box_width = $el.width();
-				image = new Image();
-				image.src = $image_link.attr('href');
-				
-				aspect_ratio = o.ratio;
-				if (aspect_ratio == 'select') {
-					if ($ratio_select.length) {
-						aspect_ratio = $ratio_select.val();
-					};
-				};
-				aspect_ratio = Number(aspect_ratio);
-				
-				$(image).load(function() {
-					if (crop_coords.toString() == '0,0,0,0') {
-						$(image).appendTo($el);
-						cropper = $.Jcrop(image, {
-							aspectRatio: aspect_ratio,
-							boxWidth: box_width,
-							minSize: o.minSize,
-							onChange: showCoords,
-							onSelect: showCoords
-						});
-					} else {
-						$(image).appendTo($el);
-						cropper = $.Jcrop(image, {
-							aspectRatio: aspect_ratio,
-							boxWidth: box_width,
-							minSize: o.minSize,
-							setSelect: crop_coords,
-							onChange: showCoords,
-							onSelect: showCoords
-						});
-					};
-
-					if ($ratio_select.length) {
-						$ratio_select.change(function() {
-							aspect_ratio = parseFloat($(this).val());
-							cropper.setOptions({
-								aspectRatio: aspect_ratio
-							});
-							cropper.focus();
-							checkMinDimension();
-						});
-					};
-
-					checkMinDimension();
-				});
+				createCropper();
 			} else {
-				$el.find('.group').hide();
-				$el.find('fieldset').hide();
-				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
-				clearCoords();
+				hideCropper();
 			};
-
+			
+			$ratio_select.change(function() {
+				aspect_ratio = parseFloat($(this).val());
+				cropper.setOptions({
+					aspectRatio: aspect_ratio
+				});
+				cropper.focus();
+				checkMinDimension();
+			});
+			
 			$clear_link.click(function(e) {
 				e.preventDefault();
 				cropper.release();
 				clearCoords();
 			});
-
+			
 			$preview_toggle.toggle(function(e) {
 				e.preventDefault();
 				$preview_fieldset.slideDown(200);
@@ -159,15 +124,60 @@
 			});
 			
 			$remove_link.click(function() {
-				cropper.destroy();
-				clearCoords();
-				$el.find('.group').hide();
-				$el.find('fieldset').hide();
-				$el.find('img').remove();
-				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
+				destroyCropper();
 			});
 			
 			// private methods
+			function createCropper() {
+				if (o.image_width > box_width) {
+					resize_width = Math.floor(box_width / 50) * 50;
+					resize_height = Math.round(resize_width * o.image_height / o.image_width);
+					image_path = Symphony.Context.get('root') + '/image/1/' + resize_width + '/' + resize_height + o.image_file;
+					$image = $('<img width="' + resize_width + '" height="' + resize_height + '" src="' + image_path + '"/>');
+				} else {
+					image_path = Symphony.Context.get('root') + '/workspace' + o.image_file;
+					$image = $('<img width="' + o.image_width + '" height="' + o.image_height + '" src="' + image_path + '"/>');
+				};
+				
+				$image.appendTo($el);
+				
+				if (aspect_ratio == 'select') {
+					if ($ratio_select.length) {
+						aspect_ratio = $ratio_select.val();
+					};
+				};
+				aspect_ratio = Number(aspect_ratio);
+				
+				$image.load(function() {
+					cropper = $.Jcrop($image, {
+						aspectRatio: aspect_ratio,
+						trueSize: [o.image_width, o.image_height],
+						minSize: o.min_size,
+						onChange: showCoords,
+						onSelect: showCoords
+					});
+
+					if (crop_coords.toString() != '0,0,0,0') {
+						cropper.setSelect(crop_coords);
+					};
+
+					checkMinDimension();
+				});
+			}
+			
+			function hideCropper() {
+				$el.find('.group').hide();
+				$el.find('fieldset').hide();
+				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
+				clearCoords();
+			}
+			
+			function destroyCropper() {
+				hideCropper();
+				cropper.destroy();
+				$el.find('img').remove();
+			}
+			
 			function showCoords(c) {
 				var scale = $preview_scale_input.val() / 100,
 					scaled_width = Math.round(c.w * scale),
@@ -181,7 +191,7 @@
 				$width_input.val(c.w);
 				$height_input.val(c.h);
 				$ratio_input.val(Math.round(100 * c.w/c.h)/100);
-				$preview_url_input.val(Symphony.Context.get('root') + '/image/4/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + image_path);
+				$preview_url_input.val(Symphony.Context.get('root') + '/image/4/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + o.image_file);
 			};
 			
 			function clearCoords(){
@@ -199,17 +209,17 @@
 			function checkMinDimension(){
 				var tooSmall;
 				
-				if (o.minSize[0] == 0 && o.minSize[1] == 0) {
+				if (o.min_size[0] == 0 && o.min_size[1] == 0) {
 					tooSmall = false;
 				}
-				else if (o.minSize[0] == 0) {
-					tooSmall = (image.width < o.minSize[1] * aspect_ratio) || (image.height < o.minSize[1]);
+				else if (o.min_size[0] == 0) {
+					tooSmall = ($image.width() < o.min_size[1] * aspect_ratio) || ($image.height() < o.min_size[1]);
 				}
-				else if (o.minSize[1] == 0) {
-					tooSmall = (image.width < o.minSize[0]) || (image.height < (aspect_ratio == 0 ? 0 : o.minSize[0] / aspect_ratio));
+				else if (o.min_size[1] == 0) {
+					tooSmall = ($image.width() < o.min_size[0]) || ($image.height() < (aspect_ratio == 0 ? 0 : o.min_size[0] / aspect_ratio));
 				}
 				else {
-					tooSmall =  (image.width < o.minSize[0]) || (image.height < o.minSize[1]);
+					tooSmall =  ($image.width() < o.min_size[0]) || ($image.height() < o.min_size[1]);
 				};
 				
 				if (tooSmall) {
