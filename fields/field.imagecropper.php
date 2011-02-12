@@ -375,7 +375,7 @@
 			// group for action links and aspect ratio select box
 			$group = new XMLElement('div', NULL, array('class' => 'group'));
 
-			$actions = Widget::Label(__('Actions'));
+			$actions = new XMLElement('div', __('Actions'));
 			$list = new XMLElement('ul');
 			$list_item = new XMLElement('li');
 			$list_item->appendChild(Widget::Anchor(__('Reset'), '#', __('Reset all values'), 'imagecropper_clear'));
