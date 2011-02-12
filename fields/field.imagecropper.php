@@ -332,10 +332,21 @@
 			Symphony::Engine()->Page->addScriptToHead(URL . $assets_path . 'jquery-ui-1.8.9.custom.min.js', 440, false);
 			Symphony::Engine()->Page->addScriptToHead(URL . $assets_path . 'imagecropper.publish.js', 450, false);
 
-			// initialize som variables
+			// initialize some variables
 			$id = $this->get('id');
 			$related_field_id = $this->get('related_field_id');
 			$fieldname = 'fields' . $fieldnamePrefix . '['. $this->get('element_name') . ']' . $fieldnamePostfix;
+
+			// get info about the related field entry data
+			$callback = Symphony::Engine()->getPageCallback();
+			$entry_id = $callback['context']['entry_id'];
+			
+			if (isset($entry_id)) {
+				$entryManager = new EntryManager(Symphony::Engine());
+				$entry = $entryManager->fetch($entry_id);
+				$imageData = $entry[0]->getData($related_field_id);
+				$imageMeta = unserialize($imageData['meta']);
+			}
 
 			// main field label
 			$label = Widget::Label($this->get('label'));
@@ -457,6 +468,8 @@
 				'data-related_field_id' => $this->get('related_field_id'),
 				'data-ratio' => $imagecropper_ratio,
 				'data-min_size' => '['.$this->get('min_width').','.$this->get('min_height').']',
+				'data-image-width' => $imageMeta['width'],
+				'data-image-height' => $imageMeta['height'],
 			));
 
 			// appen field to wrapper
