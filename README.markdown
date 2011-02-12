@@ -48,9 +48,11 @@ There is an optional thumbnail preview in entry overview tables.
 
 * Symphony 2.2 compatibility
 * "Create URL" functionality
+* "Preview" functionality
+* JIT to scale down large images
 * Style fixes
 
-### Version 1.0beta - 2011-02-11
+### Version 1.0beta - 2010-03-21
 
 * first public version
 
