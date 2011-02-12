@@ -1,3 +1,4 @@
+/* @group general */
 .field-imagecropper div.frame {
 	margin: -1.5em 0 1.5em 0;
 	padding: 12px;
@@ -44,3 +45,17 @@
 	border: 1px solid #c31;
 	border-bottom-width: 0;
 }
+/* @end */
+
+/* @group Subsection Manager */
+body.inline.subsection form .field-imagecropper fieldset {
+	padding: 0.75em 0;
+	border-top-color: #616057;
+	border-bottom-width: 0 !important;
+}
+
+body.inline.subsection form .field-imagecropper div.frame {
+	border: 1px solid #616057;
+	background: #494949;
+}
+/* @end */
