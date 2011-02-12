@@ -371,6 +371,9 @@
 			$list_item->appendChild(Widget::Anchor(__('Reset'), '#', __('Reset all values'), 'imagecropper_clear'));
 			$list->appendChild($list_item);
 			$list_item = new XMLElement('li');
+			$list_item->appendChild(Widget::Anchor(__('Preview'), '#', __('Open current detail of the image in a new window'), 'imagecropper_preview_link'));
+			$list->appendChild($list_item);
+			$list_item = new XMLElement('li');
 			$list_item->appendChild(Widget::Anchor(__('Show URL'), '#', __('Show URL of the current detail'), 'imagecropper_preview_toggle'));
 			$list->appendChild($list_item);
 			$actions->appendChild($list);
@@ -430,7 +433,6 @@
 			$group = new XMLElement('div', NULL, array('class' => 'group'));
 
 			$label = Widget::Label(__('URL'));
-			$label->appendChild(new XMLElement('i', '<a class="imagecropper_preview_link" href="#">' . __('Preview') . '</a>'));
 			$label->appendChild(Widget::Input($fieldname.'[preview_url]'));
 			$group->appendChild($label);
 
