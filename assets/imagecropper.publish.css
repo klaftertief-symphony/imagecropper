@@ -58,6 +58,7 @@ body.inline.subsection form .field-imagecropper fieldset {
 
 body.inline.subsection form .field-imagecropper div.frame {
 	border: 1px solid #616057;
+	color: #fff;
 	background: #494949;
 }
 /* @end */
