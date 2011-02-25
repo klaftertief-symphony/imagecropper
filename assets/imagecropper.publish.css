@@ -61,4 +61,12 @@ body.inline.subsection form .field-imagecropper div.frame {
 	color: #fff;
 	background: #494949;
 }
+
+body.inline.subsection form .field-imagecropper .invalid div.frame {
+	margin-bottom: 0;
+	background-color: #d42;
+	border: 1px solid #c31;
+	border-bottom-width: 0;
+}
+
 /* @end */
