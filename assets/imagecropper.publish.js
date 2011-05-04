@@ -55,9 +55,10 @@
 				$preview_scale = $preview_fieldset.find('.imagecropper_scale'),
 				$preview_scale_input = $preview_fieldset.find('input[name="' + field_prefix + '\\[preview_scale\\]"]').hide(),
 				$preview_scale_slider = $preview_fieldset.find('.imagecropper_scale_slider'),
-				$upload_field = $('#field-' + o.related_field_id).find('input'),
-				$image_link = $upload_field.prev(),
-				$remove_link = $upload_field.next(),
+				$upload_field = $('#field-' + o.related_field_id),
+				// "normal" upload fields have an <em> as remove-link
+				// the "advanced upload field" has different markup
+				$remove_link = $upload_field.find('em, .clear'),
 				cropper,
 				aspect_ratio = o.ratio,
 				$image,
@@ -67,7 +68,7 @@
 				resize_height,
 				crop_coords = [Number($x1_input.val()), Number($y1_input.val()), Number($x2_input.val()), Number($y2_input.val())];
 			
-			if ($image_link.length) {
+			if (o.image_file) {
 				createCropper();
 			} else {
 				hideCropper();
