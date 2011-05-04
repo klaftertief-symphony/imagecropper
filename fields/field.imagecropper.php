@@ -321,7 +321,7 @@
 			);
 		}
 
-		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL) {
+		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL, $entry_id) {
 
 			// append assets
 			$assets_path = '/extensions/imagecropper/assets/';
@@ -338,9 +338,7 @@
 			$fieldname = 'fields' . $fieldnamePrefix . '['. $this->get('element_name') . ']' . $fieldnamePostfix;
 
 			// get info about the related field entry data
-			$callback = Symphony::Engine()->getPageCallback();
-			$entry_id = $callback['context']['entry_id'];
-			if (isset($entry_id)) {
+			if ($entry_id != 0) {
 				$entryManager = new EntryManager(Symphony::Engine());
 				$entry = $entryManager->fetch($entry_id);
 				$imageData = $entry[0]->getData($related_field_id);
