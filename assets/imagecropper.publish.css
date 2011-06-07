@@ -51,6 +51,12 @@
 	border: 1px solid #c31;
 	border-bottom-width: 0;
 }
+	.field-imagecropper .invalid div.frame .group label {
+		border-width: 0;
+	}
+	.field-imagecropper .invalid div.frame fieldset.imagecropper_preview .help {
+		color: #fff;
+	}
 /* @end */
 
 /* @group Subsection Manager */
