@@ -149,17 +149,20 @@
 				aspect_ratio = Number(aspect_ratio);
 				
 				$image.load(function() {
-					cropper = $.Jcrop($image, {
+					$image.Jcrop({
 						aspectRatio: aspect_ratio,
 						trueSize: [o.image_width, o.image_height],
 						minSize: o.min_size,
 						onChange: showCoords,
 						onSelect: showCoords
+					}, function(){
+						cropper = this;
+						
+						if (crop_coords.toString() != '0,0,0,0') {
+							cropper.setSelect(crop_coords);
+						};
+						
 					});
-
-					if (crop_coords.toString() != '0,0,0,0') {
-						cropper.setSelect(crop_coords);
-					};
 
 					checkMinDimension();
 				});
