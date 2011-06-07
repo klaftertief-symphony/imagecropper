@@ -213,13 +213,13 @@
 					tooSmall = false;
 				}
 				else if (o.min_size[0] == 0) {
-					tooSmall = ($image.width() < o.min_size[1] * aspect_ratio) || ($image.height() < o.min_size[1]);
+					tooSmall = (o.image_width < o.min_size[1] * aspect_ratio) || (o.image_height < o.min_size[1]);
 				}
 				else if (o.min_size[1] == 0) {
-					tooSmall = ($image.width() < o.min_size[0]) || ($image.height() < (aspect_ratio == 0 ? 0 : o.min_size[0] / aspect_ratio));
+					tooSmall = (o.image_width < o.min_size[0]) || (o.image_height < (aspect_ratio == 0 ? 0 : o.min_size[0] / aspect_ratio));
 				}
 				else {
-					tooSmall =  ($image.width() < o.min_size[0]) || ($image.height() < o.min_size[1]);
+					tooSmall =  (o.image_width < o.min_size[0]) || (o.image_height < o.min_size[1]);
 				};
 				
 				if (tooSmall) {
