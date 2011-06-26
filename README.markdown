@@ -44,6 +44,11 @@ There is an optional thumbnail preview in entry overview tables.
 
 ## Change Log
 
+### Version 1.0.1 - 2011-06-26
+
+* Fix for issue when an imagecropper field is used in a subsection
+* Fix for minimum dimension rounding issue
+
 ### Version 1.0.1 - 2011-06-07
 
 * Updated to Jcrop 0.9.9
