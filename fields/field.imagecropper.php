@@ -479,8 +479,8 @@
 			}
 		}
 
-		function prepareTableValue($data, XMLElement $link=NULL, $entry_id){
-			if ($data['cropped'] == 'yes') {
+		function prepareTableValue($data, XMLElement $link=NULL, $entry_id = NULL){
+			if (isset($entry_id) && $data['cropped'] == 'yes') {
 				$entryManager = new EntryManager(Symphony::Engine());
 				$entries = $entryManager->fetch($entry_id);
 				
@@ -500,6 +500,12 @@
 				return $link->generate();
 			}
 
+		}
+
+		function preparePlainTextValue($data, $entry_id){
+			if ($data['cropped'] == 'yes') {
+				return "x1: {$data['x1']}px, y1: {$data['y1']}px, x2: {$data['x2']}px, y2: {$data['y2']}px";
+			}
 		}
 
 		public function appendFormattedElement(&$wrapper, $data, $encode = false) {
