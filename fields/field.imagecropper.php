@@ -496,7 +496,7 @@
 			}
 
 			else{
-				$link = new XMLElement('span', $image);
+				$link = Widget::Anchor($image, URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/'.$data['width'].'/'.$data['height']. $entryData[$this->get('related_field_id')]['file']);
 				return $link->generate();
 			}
 
