@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="imagecropper" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Field: Image Cropper</name>
+	<description>Adds image cropping functionality to upload fields.</description>
+	<repo type="github">https://github.com/klaftertief/imagecropper</repo>
+	<url type="discuss">http://symphony-cms.com/discuss/thread/41680/</url>
+	<types>
+		<type>Field Types</type>
+		<type>Workflow</type>
+	</types>
+	<authors>
+		<author>
+			<name github="klaftertief" symphony="klaftertief">Jonas Coch</name>
+			<website>http://klaftertief.de</website>
+		</author>
+	</authors>
+	<media>
+		<item type="image" url="http://symphonyextensions.com/klaftertief/imagecropper/media/imagecropper.png">Image cropping for Symphony CMS</item>
+	</media>
+	<releases>
+		<release version="1.0.2" date="2011-06-26" min="2.2" />
+	</releases>
+</extension>
