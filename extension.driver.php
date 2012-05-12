@@ -2,24 +2,9 @@
 
 	Class Extension_ImageCropper extends Extension{
 
-		public function about(){
-			return array(
-				'name' => 'Field: Image Cropper',
-				'type' => 'Field, Interface',
-				'version' => '1.0.2',
-				'release-date' => '2011-06-26',
-				'author' => array(
-					'name' => 'Jonas Coch',
-					'website' => 'http://klaftertief.de',
-					'email' => 'jonas@klaftertief.de'
-				),
-				'description' => 'Adds image cropping functionality to upload fields.'
-			);
-		}
-		
 		public function install(){
-			return Symphony::Database()->query(
-				"CREATE TABLE `tbl_fields_imagecropper` (
+			return Symphony::Database()->query("
+				CREATE TABLE `tbl_fields_imagecropper` (
 					`id` int(11) unsigned NOT NULL auto_increment,
 					`field_id` int(11) unsigned NOT NULL,
 					`related_field_id` int(11) unsigned NOT NULL,
@@ -28,10 +13,10 @@
 					`ratios` text, 
 					PRIMARY KEY  (`id`),
 					KEY `field_id` (`field_id`)
-				)"
-			);
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+			");
 		}
-			
+		
 		public function uninstall() {
 			Symphony::Database()->query("DROP TABLE `tbl_fields_imagecropper`");
 		}

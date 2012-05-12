@@ -202,7 +202,7 @@
 				$width_input.val(c.w);
 				$height_input.val(c.h);
 				$ratio_input.val(Math.round(100 * c.w/c.h)/100);
-				$preview_url_input.val(Symphony.Context.get('root') + '/image/4/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + o.image_file);
+				$preview_url_input.val(Symphony.Context.get('root') + '/image/5/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + o.image_file);
 			};
 
 			function clearCoords(){
