@@ -178,7 +178,7 @@
 			// related field
 			$label = Widget::Label(__('Related upload field'), NULL);
 			$fieldManager = new FieldManager(Symphony::Engine());
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="advancedupload")');
+			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="advancedupload" OR type="image_upload")');
 			$options = array(
 				array('', false, __('None Selected'), ''),
 			);
@@ -241,7 +241,7 @@
 			// check for presence of upload fields
 			$section_id = Administration::instance()->Page->_context[1];
 			$fieldManager = new FieldManager(Symphony::Engine());
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
+			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="image_upload")');
 			if(empty($fields)) {
 				$errors['related_field_id'] = __('There is no upload field in this section. You have to save the section with an upload field before you can add an image cropper field.');
 			} else {
