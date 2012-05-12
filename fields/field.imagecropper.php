@@ -9,8 +9,8 @@
 		const RATIO = 3;
 		const ERROR = 4;
 
-		function __construct(&$parent) {
-			parent::__construct($parent);
+		function __construct() {
+			parent::__construct();
 			$this->_name = __('Image Cropper');
 			$this->_required = false;
 			$this->_showcolumn = true;
@@ -177,8 +177,7 @@
 
 			// related field
 			$label = Widget::Label(__('Related upload field'), NULL);
-			$fieldManager = new FieldManager(Symphony::Engine());
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="advancedupload")');
+			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="advancedupload")');
 			$options = array(
 				array('', false, __('None Selected'), ''),
 			);
@@ -240,8 +239,7 @@
 		function checkFields(&$errors, $checkForDuplicates=true) {
 			// check for presence of upload fields
 			$section_id = Administration::instance()->Page->_context[1];
-			$fieldManager = new FieldManager(Symphony::Engine());
-			$fields = $fieldManager->fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
+			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
 			if(empty($fields)) {
 				$errors['related_field_id'] = __('There is no upload field in this section. You have to save the section with an upload field before you can add an image cropper field.');
 			} else {
@@ -298,39 +296,39 @@
 				}
 			}
 
-			Symphony::Engine()->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
-			return Symphony::Engine()->Database->insert($fields, 'tbl_fields_' . $this->handle());
+			Symphony::Database()->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
+			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
 		}
 
 		function createTable(){
-			return Symphony::Engine()->Database->query(
-				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
-				`id` int(11) unsigned NOT NULL auto_increment,
-				`entry_id` int(11) unsigned NOT NULL,
-			  `cropped` enum('yes','no') NOT NULL default 'no',
-				`ratio` varchar(255) default NULL,
-				`width` int(11) unsigned default NULL,
-				`height` int(11) unsigned default NULL,
-				`x1` int(11) unsigned default NULL,
-				`x2` int(11) unsigned default NULL,
-				`y1` int(11) unsigned default NULL,
-				`y2` int(11) unsigned default NULL,
-				PRIMARY KEY  (`id`),
-				KEY `entry_id` (`entry_id`)
-				);"
-			);
+			return Symphony::Database()->query("
+				CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
+					`id` int(11) unsigned NOT NULL auto_increment,
+					`entry_id` int(11) unsigned NOT NULL,
+					`cropped` enum('yes','no') NOT NULL default 'no',
+					`ratio` varchar(255) default NULL,
+					`width` int(11) unsigned default NULL,
+					`height` int(11) unsigned default NULL,
+					`x1` int(11) unsigned default NULL,
+					`x2` int(11) unsigned default NULL,
+					`y1` int(11) unsigned default NULL,
+					`y2` int(11) unsigned default NULL,
+					PRIMARY KEY  (`id`),
+					KEY `entry_id` (`entry_id`)
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+			");
 		}
 
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL, $entry_id) {
 
 			// append assets
 			$assets_path = '/extensions/imagecropper/assets/';
-			Symphony::Engine()->Page->addStylesheetToHead(URL . $assets_path . 'jquery.Jcrop.css', 'screen', 120, false);
-			Symphony::Engine()->Page->addStylesheetToHead(URL . $assets_path . 'jquery-ui-1.8.9.custom.css', 'screen', 130, false);
-			Symphony::Engine()->Page->addStylesheetToHead(URL . $assets_path . 'imagecropper.publish.css', 'screen', 140, false);
-			Symphony::Engine()->Page->addScriptToHead(URL . $assets_path . 'jquery.Jcrop.min.js', 430, false);
-			Symphony::Engine()->Page->addScriptToHead(URL . $assets_path . 'jquery-ui-1.8.9.custom.min.js', 440, false);
-			Symphony::Engine()->Page->addScriptToHead(URL . $assets_path . 'imagecropper.publish.js', 450, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'jquery.Jcrop.min.css', 'screen', 120, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'jquery-ui-1.8.20.custom.css', 'screen', 130, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'imagecropper.publish.css', 'screen', 140, false);
+			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'jquery.Jcrop.min.js', 430, false);
+			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'jquery-ui-1.8.20.custom.min.js', 440, false);
+			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'imagecropper.publish.js', 450, false);
 
 			// initialize some variables
 			$id = $this->get('id');
@@ -339,14 +337,13 @@
 
 			// get info about the related field entry data
 			if ($entry_id != 0) {
-				$entryManager = new EntryManager(Symphony::Engine());
-				$entry = $entryManager->fetch($entry_id);
+				$entry = EntryManager::fetch($entry_id);
 				$imageData = $entry[0]->getData($related_field_id);
 				$imageMeta = unserialize($imageData['meta']);
 			}
 
 			// main field label
-			$label = Widget::Label($this->get('label'));
+			$label = new XMLElement('p', $this->get('label'), array('class' => 'label'));
 			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
 
 			// hidden inputs
@@ -368,7 +365,7 @@
 			$wrapper->appendChild($label);
 
 			// main imagecropper container
-			$imagecropper = new XMLElement('div', NULL, array('class' => 'frame imagecropper'));
+			$imagecropper = new XMLElement('div', NULL, array('class' => 'inline frame imagecropper'));
 			
 			// group for action links and aspect ratio select box
 			$group = new XMLElement('div', NULL, array('class' => 'group'));
@@ -427,7 +424,7 @@
 								$options[] = array($ratio_float, $selected, $ratio);
 							}
 						}
-						$aspect_ratio->appendChild(Widget::Select(NULL, $options, array('name' => $fieldname.'[ratio]')));
+						$aspect_ratio->appendChild(Widget::Select('', $options, array('name' => $fieldname.'[ratio]')));
 					break;
 				}
 			}
@@ -481,8 +478,7 @@
 
 		function prepareTableValue($data, XMLElement $link=NULL, $entry_id = NULL){
 			if (isset($entry_id) && $data['cropped'] == 'yes') {
-				$entryManager = new EntryManager(Symphony::Engine());
-				$entries = $entryManager->fetch($entry_id);
+				$entries = EntryManager::fetch($entry_id);
 				
 				$entryData = $entries[0]->getData();
 				$image = '<img style="vertical-align: middle;" src="' . URL . '/image/4/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/0/40'. $entryData[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
