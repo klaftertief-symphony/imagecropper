@@ -1,7 +1,4 @@
 /* @group general */
-.field-imagecropper div.frame > .group {
-	margin-bottom: 8px;
-}
 .field-imagecropper div.frame label {
 	margin-top: 0;
 }
@@ -27,16 +24,11 @@
 			display: block;
 			margin-top: 0.6em;
 		}
-		.field-imagecropper div.frame fieldset.imagecropper_preview .group > * {
-			width: 30%
-		}
-		.field-imagecropper div.frame fieldset.imagecropper_preview .group > *:first-child {
-			width: 70%;
+		.field-imagecropper div.frame fieldset.imagecropper_preview .column {
+			padding-left: 15px;
 		}
 		.field-imagecropper div.frame fieldset.imagecropper_preview .help {
-			margin-bottom: 0;
-			position: relative;
-			top: -0.75em;
+			margin: 0.5em 0;
 		}
 
 .field-imagecropper .invalid div.frame {
@@ -72,5 +64,4 @@ body.inline.subsection form .field-imagecropper .invalid div.frame {
 	border: 1px solid #c31;
 	border-bottom-width: 0;
 }
-
 /* @end */

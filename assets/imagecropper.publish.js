@@ -183,8 +183,12 @@
 
 			function showCoords(c) {
 				// fix for rounding issues
-				c.w = Math.max(c.w, o.min_size[0]);
-				c.h = Math.max(c.h, o.min_size[1]);
+				c.w = Math.round(Math.max(c.w, o.min_size[0]));
+				c.h = Math.round(Math.max(c.h, o.min_size[1]));
+				c.x = Math.round(c.x);
+				c.y = Math.round(c.y);
+				c.x2 = Math.round(c.x2);
+				c.y2 = Math.round(c.y2);
 
 				var scale = $preview_scale_input.val() / 100,
 					scaled_width = Math.round(c.w * scale),

@@ -9,6 +9,8 @@
 		const RATIO = 3;
 		const ERROR = 4;
 
+		private $supported_upload_fields = array('upload', 'uniqueupload', 'signedfileupload', 'image_upload');
+
 		function __construct() {
 			parent::__construct();
 			$this->_name = __('Image Cropper');
@@ -177,7 +179,7 @@
 
 			// related field
 			$label = Widget::Label(__('Related upload field'), NULL);
-			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload" OR type="advancedupload")');
+			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, sprintf("AND (type IN ('%s'))", implode("', '", $this->supported_upload_fields)));
 			$options = array(
 				array('', false, __('None Selected'), ''),
 			);
@@ -214,8 +216,9 @@
 			$wrapper->appendChild($help);
 
 			// minimal dimension
-			$min_dimension = new XMLElement('div', NULL, array('class' => 'group'));
+			$min_dimension = new XMLElement('div', NULL, array('class' => 'two columns'));
 			$label = Widget::Label(__('Minimum width <i>Optional</i>'));
+			$label->addClass('column');
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][min_width]', $this->get('min_width')?$this->get('min_width'):''));
 			if(isset($errors['min_width'])) {
 				$min_dimension->appendChild(Widget::wrapFormElementWithError($label, $errors['min_width']));
@@ -223,6 +226,7 @@
 				$min_dimension->appendChild($label);
 			};
 			$label = Widget::Label(__('Minimum height <i>Optional</i>'));
+			$label->addClass('column');
 			$label->appendChild(Widget::Input('fields['.$this->get('sortorder').'][min_height]', $this->get('min_height')?$this->get('min_height'):''));
 			if(isset($errors['min_height'])) {
 				$min_dimension->appendChild(Widget::wrapFormElementWithError($label, $errors['min_height']));
@@ -233,13 +237,15 @@
 			$help = new XMLElement('p', __('Set minimum dimensions for the cropped image.'), array('class' => 'help'));
 			$wrapper->appendChild($help);
 
-			$this->appendShowColumnCheckbox($wrapper);
+			$column = new XMLElement('div', NULL, array('class' => 'two columns'));
+			$this->appendShowColumnCheckbox($column);
+			$wrapper->appendChild($column);
 		}
 
 		function checkFields(&$errors, $checkForDuplicates=true) {
 			// check for presence of upload fields
 			$section_id = Administration::instance()->Page->_context[1];
-			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, 'AND (type = "upload" OR type = "uniqueupload" OR type="signedfileupload")');
+			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, sprintf("AND (type IN ('%s'))", implode("', '", $this->supported_upload_fields)));
 			if(empty($fields)) {
 				$errors['related_field_id'] = __('There is no upload field in this section. You have to save the section with an upload field before you can add an image cropper field.');
 			} else {
@@ -368,9 +374,9 @@
 			$imagecropper = new XMLElement('div', NULL, array('class' => 'inline frame imagecropper'));
 			
 			// group for action links and aspect ratio select box
-			$group = new XMLElement('div', NULL, array('class' => 'group'));
+			$group = new XMLElement('div', NULL, array('class' => 'two columns'));
 
-			$actions = new XMLElement('div', __('Actions'));
+			$actions = new XMLElement('div', __('Actions'), array('class' => 'column'));
 			$list = new XMLElement('ul');
 			$list_item = new XMLElement('li');
 			$list_item->appendChild(Widget::Anchor(__('Reset'), '#', __('Reset all values'), 'imagecropper_clear'));
@@ -385,7 +391,7 @@
 			$group->appendChild($actions);
 
 			$ratios = array_unique(explode(',',$this->get('ratios')));
-			$aspect_ratio = Widget::Label(__('Aspect ratio'));
+			$aspect_ratio = Widget::Label(__('Aspect ratio'), null, 'column');
 			if(is_array($ratios)) {
 				$number_of_ratios = count($ratios);
 				switch ($number_of_ratios) {
@@ -435,13 +441,13 @@
 			// URL of cropped image
 			$fieldset = new XMLElement('fieldset', NULL, array('class' => 'imagecropper_preview'));
 
-			$group = new XMLElement('div', NULL, array('class' => 'group'));
+			$group = new XMLElement('div', NULL, array('class' => 'two columns'));
 
-			$label = Widget::Label(__('URL'));
+			$label = Widget::Label(__('URL'), null, 'primary column');
 			$label->appendChild(Widget::Input($fieldname.'[preview_url]'));
 			$group->appendChild($label);
 
-			$label = Widget::Label(__('Scale'));
+			$label = Widget::Label(__('Scale'), null, 'secondary column');
 			$label->appendChild(new XMLElement('i', NULL, array('class' => 'imagecropper_scale')));
 			$label->appendChild(Widget::Input($fieldname.'[preview_scale]', '100'));
 			$label->appendChild(new XMLElement('span', NULL, array('class' => 'imagecropper_scale_slider')));
