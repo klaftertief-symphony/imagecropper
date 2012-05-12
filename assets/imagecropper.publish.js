@@ -24,7 +24,7 @@
 					image_height: $this.data('image_height'),
 					image_file: $this.data('image_file')
 				};
-				
+
 			$this.imageCropper(options);
 		});
 	});
@@ -66,13 +66,13 @@
 				resize_width,
 				resize_height,
 				crop_coords = [Number($x1_input.val()), Number($y1_input.val()), Number($x2_input.val()), Number($y2_input.val())];
-			
+
 			if ($image_link.length) {
 				createCropper();
 			} else {
 				hideCropper();
 			};
-			
+
 			$ratio_select.change(function() {
 				aspect_ratio = parseFloat($(this).val());
 				cropper.setOptions({
@@ -81,13 +81,13 @@
 				cropper.focus();
 				checkMinDimension();
 			});
-			
+
 			$clear_link.click(function(e) {
 				e.preventDefault();
 				cropper.release();
 				clearCoords();
 			});
-			
+
 			$preview_toggle.toggle(function(e) {
 				e.preventDefault();
 				$preview_fieldset.slideDown(200);
@@ -97,16 +97,16 @@
 				$preview_fieldset.slideUp(200);
 				$(this).text(Symphony.Language.get('Show URL'));
 			});
-			
+
 			$preview_link.click(function(e) {
 				e.preventDefault();
 				var scale = $preview_scale_input.val() / 100,
 					width = $width_input.val() * scale,
 					height = $height_input.val() * scale;
-				
+
 				window.open($preview_url_input.val(), 'imagecropper_preview', 'height=' + height + ',width=' + width);
 			});
-			
+
 			$preview_scale_slider.slider({
 				value: $preview_scale_input.val(),
 				min: 0,
@@ -116,17 +116,17 @@
 				},
 				slide: function(event, ui) {
 					var c = cropper.tellSelect();
-					
+
 					$preview_scale_input.val(ui.value);
 					$preview_scale.text(ui.value + '%');
 					showCoords(c);
 				}
 			});
-			
+
 			$remove_link.click(function() {
 				destroyCropper();
 			});
-			
+
 			// private methods
 			function createCropper() {
 				if (o.image_width > box_width) {
@@ -138,16 +138,16 @@
 					image_path = Symphony.Context.get('root') + '/workspace' + o.image_file;
 					$image = $('<img width="' + o.image_width + '" height="' + o.image_height + '" src="' + image_path + '"/>');
 				};
-				
+
 				$image.appendTo($el);
-				
+
 				if (aspect_ratio == 'select') {
 					if ($ratio_select.length) {
 						aspect_ratio = $ratio_select.val();
 					};
 				};
 				aspect_ratio = Number(aspect_ratio);
-				
+
 				$image.load(function() {
 					$image.Jcrop({
 						aspectRatio: aspect_ratio,
@@ -157,39 +157,39 @@
 						onSelect: showCoords
 					}, function(){
 						cropper = this;
-						
+
 						if (crop_coords.toString() != '0,0,0,0') {
 							cropper.setSelect(crop_coords);
 						};
-						
+
 					});
 
 					checkMinDimension();
 				});
 			}
-			
+
 			function hideCropper() {
 				$el.find('.group').hide();
 				$el.find('fieldset').hide();
 				$el.append(Symphony.Language.get('No image found. Please upload an image and save entry.'));
 				clearCoords();
 			}
-			
+
 			function destroyCropper() {
 				hideCropper();
 				cropper.destroy();
 				$el.find('img').remove();
 			}
-			
+
 			function showCoords(c) {
 				// fix for rounding issues
 				c.w = Math.max(c.w, o.min_size[0]);
 				c.h = Math.max(c.h, o.min_size[1]);
-				
+
 				var scale = $preview_scale_input.val() / 100,
 					scaled_width = Math.round(c.w * scale),
 					scaled_height = Math.round(c.h * scale);
-				
+
 				$cropped_input.val('yes');
 				$x1_input.val(c.x);
 				$y1_input.val(c.y);
@@ -200,7 +200,7 @@
 				$ratio_input.val(Math.round(100 * c.w/c.h)/100);
 				$preview_url_input.val(Symphony.Context.get('root') + '/image/4/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + o.image_file);
 			};
-			
+
 			function clearCoords(){
 				$cropped_input.val('no');
 				$x1_input.val('');
@@ -212,10 +212,10 @@
 				$ratio_input.val('');
 				$preview_url_input.val('');
 			};
-			
+
 			function checkMinDimension(){
 				var tooSmall;
-				
+
 				if (o.min_size[0] == 0 && o.min_size[1] == 0) {
 					tooSmall = false;
 				}
@@ -228,7 +228,7 @@
 				else {
 					tooSmall =  (o.image_width < o.min_size[0]) || (o.image_height < o.min_size[1]);
 				};
-				
+
 				if (tooSmall) {
 					if (!$field.find('#error').length) {
 						$el.wrap('<div id="error" class="invalid"></div>');
@@ -239,11 +239,11 @@
 					clearCoords();
 				};
 			};
-			
+
 			function nothing () {
 				return false;
 			}
 		});
 	};
-	
+
 })(jQuery.noConflict());
