@@ -411,7 +411,7 @@
 						$dividend = preg_replace($pattern, '$2', $ratios[0]);
 						$divisor = preg_replace($pattern, '$6', $ratios[0]);
 						$imagecropper_ratio = round($dividend/$divisor,3);
-						$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', $imagecropper_ratio, 'hidden'));
+						$aspect_ratio->appendChild(Widget::Input($fieldname.'[ratio]', (string)$imagecropper_ratio, 'hidden'));
 						$aspect_ratio->appendChild(new XMLElement('p', __('Fixed at ').$ratios[0]));
 					break;
 					default:
