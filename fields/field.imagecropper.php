@@ -9,7 +9,7 @@
 		const RATIO = 3;
 		const ERROR = 4;
 
-		private $supported_upload_fields = array('upload', 'uniqueupload', 'signedfileupload', 'image_upload');
+		private $supported_upload_fields = array('upload', 'uniqueupload', 'signedfileupload', 'image_upload', 'reflectedupload');
 
 		function __construct() {
 			parent::__construct();
