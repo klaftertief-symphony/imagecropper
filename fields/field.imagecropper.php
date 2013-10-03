@@ -16,7 +16,7 @@
 			$this->_name = __('Image Cropper');
 			$this->_required = false;
 			$this->_showcolumn = true;
-			$this->_section_id = SectionManager::fetchIDFromHandle(Administration::instance()->Page->_context['section_handle']);
+			$this->_section_id = defined("Administration") ? SectionManager::fetchIDFromHandle(Administration::instance()->Page->_context['section_handle']) : null;
 		}
 
 		function canFilter(){
