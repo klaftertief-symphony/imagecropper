@@ -16,6 +16,7 @@
 			$this->_name = __('Image Cropper');
 			$this->_required = false;
 			$this->_showcolumn = true;
+			$this->_section_id = SectionManager::fetchIDFromHandle(Administration::instance()->Page->_context['section_handle']);
 		}
 
 		function canFilter(){
@@ -174,12 +175,9 @@
 		function displaySettingsPanel(&$wrapper, $errors=NULL) {
 			parent::displaySettingsPanel($wrapper, $errors);
 
-			// get current section id
-			$section_id = Administration::instance()->Page->_context[1];
-
 			// related field
 			$label = Widget::Label(__('Related upload field'), NULL);
-			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, sprintf("AND (type IN ('%s'))", implode("', '", $this->supported_upload_fields)));
+			$fields = FieldManager::fetch(NULL, $this->_section_id, 'ASC', 'sortorder', NULL, NULL, sprintf("AND (type IN ('%s'))", implode("', '", $this->supported_upload_fields)));
 			$options = array(
 				array('', false, __('None Selected'), ''),
 			);
@@ -244,8 +242,7 @@
 
 		function checkFields(&$errors, $checkForDuplicates=true) {
 			// check for presence of upload fields
-			$section_id = Administration::instance()->Page->_context[1];
-			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, sprintf("AND (type IN ('%s'))", implode("', '", $this->supported_upload_fields)));
+			$fields = FieldManager::fetch(NULL, $this->_section_id, 'ASC', 'sortorder', NULL, NULL, sprintf("AND (type IN ('%s'))", implode("', '", $this->supported_upload_fields)));
 			if(empty($fields)) {
 				$errors['related_field_id'] = __('There is no upload field in this section. You have to save the section with an upload field before you can add an image cropper field.');
 			} else {
@@ -340,6 +337,7 @@
 			$id = $this->get('id');
 			$related_field_id = $this->get('related_field_id');
 			$fieldname = 'fields' . $fieldnamePrefix . '['. $this->get('element_name') . ']' . $fieldnamePostfix;
+			$field = FieldManager::fetch($related_field_id);
 
 			// get info about the related field entry data
 			if ($entry_id != 0) {
@@ -468,7 +466,7 @@
 				'data-related_field_id' => $this->get('related_field_id'),
 				'data-ratio' => $imagecropper_ratio,
 				'data-min_size' => '['.$this->get('min_width').','.$this->get('min_height').']',
-				'data-image_file' => $imageData['file'],
+				'data-image_file' => $field->get('destination') . '/' . $imageData['file'],
 				'data-image_width' => $imageMeta['width'],
 				'data-image_height' => $imageMeta['height'],
 			));

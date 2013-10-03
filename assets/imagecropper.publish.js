@@ -89,11 +89,9 @@
 			});
 
 			$preview_toggle.toggle(function(e) {
-				e.preventDefault();
 				$preview_fieldset.slideDown(200);
 				$(this).text(Symphony.Language.get('Hide URL'));
 			}, function(e) {
-				e.preventDefault();
 				$preview_fieldset.slideUp(200);
 				$(this).text(Symphony.Language.get('Show URL'));
 			});
@@ -135,7 +133,7 @@
 					image_path = Symphony.Context.get('root') + '/image/1/' + resize_width + '/' + resize_height + o.image_file;
 					$image = $('<img width="' + resize_width + '" height="' + resize_height + '" src="' + image_path + '"/>');
 				} else {
-					image_path = Symphony.Context.get('root') + '/workspace' + o.image_file;
+					image_path = Symphony.Context.get('root') + o.image_file;
 					$image = $('<img width="' + o.image_width + '" height="' + o.image_height + '" src="' + image_path + '"/>');
 				};
 
