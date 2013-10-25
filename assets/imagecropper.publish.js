@@ -89,11 +89,9 @@
 			});
 
 			$preview_toggle.toggle(function(e) {
-				e.preventDefault();
 				$preview_fieldset.slideDown(200);
 				$(this).text(Symphony.Language.get('Hide URL'));
 			}, function(e) {
-				e.preventDefault();
 				$preview_fieldset.slideUp(200);
 				$(this).text(Symphony.Language.get('Show URL'));
 			});
@@ -132,10 +130,10 @@
 				if (o.image_width > box_width) {
 					resize_width = Math.floor(box_width / 50) * 50;
 					resize_height = Math.round(resize_width * o.image_height / o.image_width);
-					image_path = Symphony.Context.get('root') + '/image/1/' + resize_width + '/' + resize_height + o.image_file;
+					image_path = Symphony.Context.get('root') + '/image/1/' + resize_width + '/' + resize_height + o.image_file.replace('/workspace','');
 					$image = $('<img width="' + resize_width + '" height="' + resize_height + '" src="' + image_path + '"/>');
 				} else {
-					image_path = Symphony.Context.get('root') + '/workspace' + o.image_file;
+					image_path = Symphony.Context.get('root') + o.image_file;
 					$image = $('<img width="' + o.image_width + '" height="' + o.image_height + '" src="' + image_path + '"/>');
 				};
 
@@ -202,7 +200,7 @@
 				$width_input.val(c.w);
 				$height_input.val(c.h);
 				$ratio_input.val(Math.round(100 * c.w/c.h)/100);
-				$preview_url_input.val(Symphony.Context.get('root') + '/image/5/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + o.image_file);
+				$preview_url_input.val(Symphony.Context.get('root') + '/image/5/' + c.w + '/' + c.h + '/' + c.x + '/' + c.y + '/' + scaled_width + '/' + scaled_height + o.image_file.replace('/workspace',''));
 			};
 
 			function clearCoords(){
